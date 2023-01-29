@@ -5,6 +5,19 @@ using UnityEngine;
 public class practice_1 : MonoBehaviour
 {
     void Update(){
+        if (Input.anyKeyDown)
+            Debug.Log("플레이어가 아무 키를 눌렀습니다.");
+
+        
+        if(Input.GetButton("Horizontal")){
+            Debug.Log("횡 이동 중...." + Input.GetAxisRaw("Horizontal")); //수평, 수직 버튼 입력을 받으면 float
+        }
+
+        if(Input.GetButton("Vertical")){
+            Debug.Log("종 이동 중...." + Input.GetAxisRaw("Vertical")); //수평, 수직 버튼 입력을 받으면 float
+        }
+    
+    
         /*if (Input.anyKeyDown)
             Debug.Log("플레이어가 아무 키를 눌렀습니다.");
         if (Input.anyKey)
