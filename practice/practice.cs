@@ -41,6 +41,15 @@ public class practice : MonoBehaviour
         //4. SLerp(구면 선형 보간)
         transform.position = 
         Vector3.Slerp(transform.position, target, 0.05f);
+        
+        /*
+        Time.deltaTime 사용하는 법
+        1. Translate: 벡터에 곱하기
+        tranform.Translate(Vec * Time.deltaTime);
+        2. Vector 함수: 시간 매개변수에 곱하기
+        Vector3.Lerp(Vec1, Vec2, T * Time.deltaTime);
+
+*/
     }
 
     // Update is called once per frame
