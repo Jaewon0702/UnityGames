@@ -1,0 +1,4 @@
+Flow of Unity Game Objects
+
+Awake() ---> FixedUpdate() ---> Update()     ---> OnDestroy()      
+Start()                                  LateUpdate()   
