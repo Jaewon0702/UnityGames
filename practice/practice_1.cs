@@ -50,7 +50,7 @@ public class practice_1 : MonoBehaviour
             Debug.Log("슈퍼 점프!!");
 
         
-        
+        //여기까지 복습함
     
     }
     
