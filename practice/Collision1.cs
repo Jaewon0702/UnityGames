@@ -22,7 +22,7 @@ public class Collision1 : MonoBehaviour
 
     private void OnCollisionExit(Collision collision) { //물리적 충돌이 끝났을때 호출되는 함수
 
-        if(collision.gameObject.name == "Sphere")
+        if(collision.gameObject.name == "Sphere") //어떤 물체랑 부딪혔을 때 색깔이 바뀌는지 지정(바닥에 닿았을 때 색깔 바뀌는 거 방지)
             mat.color = new Color(1, 1, 1);
     }
 
