@@ -26,7 +26,7 @@ public class Move : MonoBehaviour
         rigid.AddForce(Vector3.up * 100, ForceMode.Impulse); //주로 캐릭터가 점프할 때 사용!!
         Debug.Log(rigid.velocity);
         }
-        Vector3 vec = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+        Vector3 vec = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical")); //키보드로 공을 왔다 갔다
 
         rigid.AddForce(vec, ForceMode.Impulse);
         
