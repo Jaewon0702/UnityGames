@@ -4,16 +4,19 @@ using UnityEngine;
 
 public class PlayerBall : MonoBehaviour
 {
-
     Rigidbody rigid;
     public float JumpPower;
     public float MovePower;
     bool isJump;
+    public int Score;
+
+    new AudioSource audio;
+
 
     private void Awake() {
-
         isJump = false;
         rigid = GetComponent<Rigidbody>();
+         audio = GetComponent<AudioSource>();
         
     }
     // Start is called before the first frame update
@@ -22,7 +25,15 @@ public class PlayerBall : MonoBehaviour
         
     }
 
+    // Update is called once per frame
 
+    void Update() {
+        if(Input.GetButtonDown("Jump") && !isJump){
+            isJump = true;
+            rigid.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
+        }
+        
+    }
     void FixedUpdate()
     {
         float h = Input.GetAxisRaw("Horizontal");
@@ -30,22 +41,20 @@ public class PlayerBall : MonoBehaviour
         rigid.AddForce(new Vector3(h,0,v) * MovePower, ForceMode.Impulse);
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        if(Input.GetButtonDown("Jump") && !isJump){
-            isJump = true;
-            rigid.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
+    void OnCollisionEnter(Collision collision) { //Floor에 한 번 닿아야 점프 가능!
+        
+        if(collision.gameObject.tag == "Floor"){
+            isJump = false; //바닥에 닿으면 점프 중이 아니다
             }
-    }
-    
-    void OnCollisionEnter(Collision collision) {
-        
-        if(collision.gameObject.name == "Floor"){
-            isJump = false;
         }
-        
-    }
 
+    void OnTriggerEnter(Collider other){
+
+        if(other.tag == "Item"){
+            Score++;
+            audio.Play();
+            other.gameObject.SetActive(false); //SetActive(bool): 오브젝트 활성화 함수
+        }
+    }
 }
 
