@@ -62,12 +62,12 @@ public class PlayerBall : MonoBehaviour
         else if(other.tag == "Finish"){
             if(Score == manager.totalItemCount){
                 //Game Clear!
-                SceneManager.LoadScene("Scene02");
+                SceneManager.LoadScene("Scene0" + (manager.stage + 1).ToString());
 
             }
 
         else {
-            SceneManager.LoadScene("Scene01");
+            SceneManager.LoadScene("Scene0" + manager.stage.ToString());
                 //Restart
                 }
 
