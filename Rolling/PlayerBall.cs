@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerBall : MonoBehaviour
 {
@@ -9,6 +10,7 @@ public class PlayerBall : MonoBehaviour
     public float MovePower;
     bool isJump;
     public int Score;
+    public GameManagerLogic manager;
 
     new AudioSource audio;
 
@@ -16,7 +18,8 @@ public class PlayerBall : MonoBehaviour
     private void Awake() {
         isJump = false;
         rigid = GetComponent<Rigidbody>();
-         audio = GetComponent<AudioSource>();
+        audio = GetComponent<AudioSource>();
+
         
     }
     // Start is called before the first frame update
@@ -55,6 +58,22 @@ public class PlayerBall : MonoBehaviour
             audio.Play();
             other.gameObject.SetActive(false); //SetActive(bool): 오브젝트 활성화 함수
         }
+
+        else if(other.tag == "Finish"){
+            if(Score == manager.totalItemCount){
+                //Game Clear!
+                SceneManager.LoadScene("Scene02");
+
+            }
+
+        else {
+            SceneManager.LoadScene("Scene01");
+                //Restart
+                }
+
+        }
+
+        
     }
 }
 
