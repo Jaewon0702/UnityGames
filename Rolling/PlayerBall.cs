@@ -9,6 +9,7 @@ public class PlayerBall : MonoBehaviour
     public float JumpPower;
     public float MovePower;
     bool isJump;
+    bool isHiddenJump;
     public int Score;
     public GameManagerLogic manager;
 
@@ -17,6 +18,7 @@ public class PlayerBall : MonoBehaviour
 
     private void Awake() {
         isJump = false;
+        isHiddenJump = false;
         rigid = GetComponent<Rigidbody>();
         audio = GetComponent<AudioSource>();
 
@@ -35,6 +37,11 @@ public class PlayerBall : MonoBehaviour
             isJump = true;
             rigid.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
         }
+
+        else if(Input.GetButtonDown("Jump") && !isHiddenJump){
+            isHiddenJump = true;
+            rigid.AddForce(Vector3.up * JumpPower * 2.1f, ForceMode.Impulse);
+        }
         
     }
     void FixedUpdate()
@@ -49,7 +56,12 @@ public class PlayerBall : MonoBehaviour
         if(collision.gameObject.tag == "Floor"){
             isJump = false; //바닥에 닿으면 점프 중이 아니다
             }
+
+        else if(collision.gameObject.tag == "HiddenFloor"){
+            isHiddenJump = false;
         }
+
+    }
 
     void OnTriggerEnter(Collider other){
 
@@ -57,29 +69,25 @@ public class PlayerBall : MonoBehaviour
             Score++;
             audio.Play();
             other.gameObject.SetActive(false); //SetActive(bool): 오브젝트 활성화 함수
+            manager.GetItemCount(Score);
         }
 
         else if(other.tag == "Finish"){
 
             if(Score == manager.totalItemCount){
                 if(manager.stage == 2){
-                    SceneManager.LoadScene("Scene02");
+                    SceneManager.LoadScene(0);
                 }
                 else{
-                //Game Clear!
-                SceneManager.LoadScene(manager.stage + 1);
+                    SceneManager.LoadScene(manager.stage + 1); //Game Clear! && Nest Stage
                 }
 
             }
-
-        else {
-            SceneManager.LoadScene(manager.stage);
+            
+            else {
+                SceneManager.LoadScene(manager.stage);
                 //Restart
-                }
-
-        }
-
-        
+            }
+        }   
     }
 }
-
