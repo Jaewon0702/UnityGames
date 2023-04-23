@@ -32,7 +32,7 @@ public class PlayerMove : MonoBehaviour
         }
 
         //Direction Sprite
-        if(Input.GetButtonDown("Horizontal")){
+        if(Input.GetButton("Horizontal")){
             spriteRenderer.flipX = Input.GetAxisRaw("Horizontal") == -1;
         }
 
@@ -71,5 +71,71 @@ public class PlayerMove : MonoBehaviour
             }
         }
         }
+
+       
     }
+    void OnCollisionEnter2D(Collision2D collision){
+            if(collision.gameObject.tag == "Enemy"){
+                // Step on(Attack) = falling & upper than monster
+                if(rigid.velocity.y < 0 && transform.position.y > collision.transform.position.y ){
+                    OnAttack(collision.transform);
+
+                }
+                //Demaged
+                else{
+                OnDemaged(collision.transform.position);
+                }
+            }
+        }
+
+    void OnTriggerEnter2D(Collider2D collision){
+        if(collision.gameObject.tag == "Item"){
+            //Point
+
+            //Deactive Item
+            collision.gameObject.SetActive(false);
+        }
+        else if(collision.gameObject.tag == "Finish"){
+            //Next stage
+
+        }
+        
+    }
+
+    void OnDemaged(Vector2 targetPos){
+
+        //Change Layer(Immortal Active)
+        gameObject.layer = 8;
+
+        //View Alpha
+        spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+
+        //Reaction Force
+        int dicr = transform.position.x - targetPos.x > 0 ? 1 : -1;
+        rigid.AddForce(new Vector2(dicr, 1) * 10, ForceMode2D.Impulse);
+
+        //Animation
+        anim.SetTrigger("doDamaged");
+
+        Invoke("OffDemaged", 3);
+    }
+
+    void OffDemaged(){
+        gameObject.layer = 7;
+        spriteRenderer.color = new Color(1, 1, 1, 1);
+
+    }
+
+    void OnAttack(Transform enemy){
+        //Point
+        rigid.AddForce(Vector2.up * 10,  ForceMode2D.Impulse);
+
+        //Enemy Die
+        EnemyMove enemymove = enemy.GetComponent<EnemyMove>();
+        enemymove.OnDemaged();
+
+
+
+    }
+
 }
