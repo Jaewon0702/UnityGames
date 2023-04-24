@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerMove : MonoBehaviour
 {
+    public GameManager gameManager;
     Rigidbody2D rigid;
     SpriteRenderer spriteRenderer;
     Animator anim;
@@ -83,7 +84,7 @@ public class PlayerMove : MonoBehaviour
                 }
                 //Demaged
                 else{
-                OnDemaged(collision.transform.position);
+                OnDamaged(collision.transform.position);
                 }
             }
         }
@@ -91,18 +92,35 @@ public class PlayerMove : MonoBehaviour
     void OnTriggerEnter2D(Collider2D collision){
         if(collision.gameObject.tag == "Item"){
             //Point
+            bool isBronze = collision.gameObject.name.Contains("Bronze");
+            bool isSilver = collision.gameObject.name.Contains("Silver");
+            bool isGold = collision.gameObject.name.Contains("Gold");
+            if(isBronze){
+                gameManager.stagePoint += 50;
+            }
+            else if(isSilver){
+                gameManager.stagePoint += 100;
+
+            }
+            else if(isGold){
+                gameManager.stagePoint += 300;
+
+            }
 
             //Deactive Item
             collision.gameObject.SetActive(false);
         }
         else if(collision.gameObject.tag == "Finish"){
             //Next stage
+            gameManager.NextStage();
 
         }
         
     }
 
-    void OnDemaged(Vector2 targetPos){
+    void OnDamaged(Vector2 targetPos){
+        //Health Down
+        gameManager.health--;
 
         //Change Layer(Immortal Active)
         gameObject.layer = 8;
@@ -117,10 +135,10 @@ public class PlayerMove : MonoBehaviour
         //Animation
         anim.SetTrigger("doDamaged");
 
-        Invoke("OffDemaged", 3);
+        Invoke("OffDamaged", 3);
     }
 
-    void OffDemaged(){
+    void OffDamaged(){
         gameObject.layer = 7;
         spriteRenderer.color = new Color(1, 1, 1, 1);
 
@@ -128,14 +146,18 @@ public class PlayerMove : MonoBehaviour
 
     void OnAttack(Transform enemy){
         //Point
+        gameManager.stagePoint += 200;
+
+        //Reaction Force
         rigid.AddForce(Vector2.up * 10,  ForceMode2D.Impulse);
 
         //Enemy Die
         EnemyMove enemymove = enemy.GetComponent<EnemyMove>();
-        enemymove.OnDemaged();
+        enemymove.EOnDamaged();
 
 
 
     }
 
 }
+
