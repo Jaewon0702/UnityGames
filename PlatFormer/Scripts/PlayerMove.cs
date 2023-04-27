@@ -8,6 +8,8 @@ public class PlayerMove : MonoBehaviour
     Rigidbody2D rigid;
     SpriteRenderer spriteRenderer;
     Animator anim;
+    BoxCollider2D Boxcollider;
+    
     public float maxSpeed;
     public float jumpPower;
 
@@ -17,6 +19,8 @@ public class PlayerMove : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
+        Boxcollider = GetComponent<BoxCollider2D>();
+       
     }
 
     void Update()
@@ -120,7 +124,7 @@ public class PlayerMove : MonoBehaviour
 
     void OnDamaged(Vector2 targetPos){
         //Health Down
-        gameManager.health--;
+        gameManager.HealthDown();
 
         //Change Layer(Immortal Active)
         gameObject.layer = 8;
@@ -159,5 +163,22 @@ public class PlayerMove : MonoBehaviour
 
     }
 
+    public void OnDie(){
+        //Sprite Alpha
+        spriteRenderer.color = new Color(1, 1, 1, 0.4f);
+
+        //Sprite Flip Y
+        spriteRenderer.flipY = true;
+
+        //Collider Disable
+        Boxcollider.enabled = false;
+
+        //Death effect jump
+        rigid.AddForce(Vector2.up * 4, ForceMode2D.Impulse);
+
+    }
+
 }
+
+ 
 
