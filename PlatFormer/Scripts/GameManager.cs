@@ -9,10 +9,27 @@ public class GameManager : MonoBehaviour
     public int stageIndex;
     public int health;
     public PlayerMove player;
+    public GameObject[] Stages;
     // Start is called before the first frame update
     public void NextStage()
     {
+        //Change Stage
+        if(stageIndex < Stages.Length - 1){
+        Stages[stageIndex].SetActive(false); 
         stageIndex++;
+        Stages[stageIndex].SetActive(true);
+        PlayerReposition();
+        }
+
+        else{ //Game Clear
+        // Player Control Lock
+        Time.timeScale = 0;
+        //Result UI
+        Debug.Log("게임 클리어!");
+        //Restart Button UI
+
+        }
+        //Calculate Point
         totalPoint += stagePoint;
         stagePoint = 0;
 
@@ -40,16 +57,16 @@ public class GameManager : MonoBehaviour
 
             //Player Reposition
             if(health > 1){
-                collision.attachedRigidbody.velocity = Vector2.zero; //Velocity Reset
-                collision.transform.position = new Vector3(-6, 0.21f, 0);
-                HealthDown();
+                PlayerReposition();
             }
-            else{
             //Health down
-                health = 0;
-                HealthDown();
-            }
+            HealthDown();
+        
+        }
+    }
+    void PlayerReposition(){
 
-        }
-        }
+    player.transform.position = new Vector3(-5.65f, -0.87f, -1);
+    player.VelocityZero();
+    }
 }
