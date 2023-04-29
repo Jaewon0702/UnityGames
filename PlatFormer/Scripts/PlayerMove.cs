@@ -67,11 +67,13 @@ public class PlayerMove : MonoBehaviour
 
         //Landing Platform
         if(rigid.velocity.y < 0){
-        Debug.DrawRay(rigid.position, Vector3.down, new Color(0, 1, 0));
-        RaycastHit2D rayHit = Physics2D.Raycast(rigid.position, Vector3.down, 1, LayerMask.GetMask("Platform"));
+        Debug.DrawRay(rigid.position + new Vector2(-0.55f, 0), Vector3.down, new Color(0, 1, 0));
+        Debug.DrawRay(rigid.position + new Vector2(0.55f, 0), Vector3.down, new Color(0, 1, 0));
+        RaycastHit2D rayHitL = Physics2D.Raycast(rigid.position + new Vector2(-0.55f, 0), Vector3.down, 1, LayerMask.GetMask("Platform"));
+        RaycastHit2D rayHitR = Physics2D.Raycast(rigid.position + new Vector2(0.55f, 0), Vector3.down, 1, LayerMask.GetMask("Platform"));
 
-        if(rayHit.collider != null){
-            if(rayHit.distance < 1.0f){
+        if(rayHitL.collider != null | rayHitR.collider != null ){
+            if(rayHitL.distance < 1.0f | rayHitR.distance < 1.0f){
                 anim.SetBool("isJumping", false);
             }
         }
@@ -79,6 +81,8 @@ public class PlayerMove : MonoBehaviour
 
        
     }
+
+
     void OnCollisionEnter2D(Collision2D collision){
             if(collision.gameObject.tag == "Enemy"){
                 // Step on(Attack) = falling & upper than monster
@@ -139,7 +143,7 @@ public class PlayerMove : MonoBehaviour
         //Animation
         anim.SetTrigger("doDamaged");
 
-        Invoke("OffDamaged", 3);
+        Invoke("OffDamaged", 1);
     }
 
     void OffDamaged(){
@@ -178,7 +182,12 @@ public class PlayerMove : MonoBehaviour
 
     }
 
+    public void VelocityZero(){
+        rigid.velocity = Vector2.zero; 
+    }
+
 }
+
 
  
 
