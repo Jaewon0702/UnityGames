@@ -86,7 +86,7 @@ public class PlayerMove : MonoBehaviour
     void OnCollisionEnter2D(Collision2D collision){
             if(collision.gameObject.tag == "Enemy"){
                 // Step on(Attack) = falling & upper than monster
-                if(rigid.velocity.y < 0 && transform.position.y > collision.transform.position.y ){
+                if(rigid.velocity.y < 0 && transform.position.y > collision.transform.position.y){
                     OnAttack(collision.transform);
 
                 }
@@ -94,6 +94,9 @@ public class PlayerMove : MonoBehaviour
                 else{
                 OnDamaged(collision.transform.position);
                 }
+            }
+            else if(collision.gameObject.tag == "Spike"){
+                OnDamaged(collision.transform.position);
             }
         }
 
@@ -187,6 +190,11 @@ public class PlayerMove : MonoBehaviour
     }
 
 }
+
+
+ 
+
+
 
 
  
