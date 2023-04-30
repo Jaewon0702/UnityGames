@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,7 +12,16 @@ public class GameManager : MonoBehaviour
     public int health;
     public PlayerMove player;
     public GameObject[] Stages;
-    // Start is called before the first frame update
+
+    public Image[] UIhealth;
+    public Text UIPoint;
+    public Text UIStage;
+    public GameObject RestartBtn;
+
+    void Update(){
+       UIPoint.text = (totalPoint + stagePoint).ToString();
+    }
+
     public void NextStage()
     {
         //Change Stage
@@ -19,6 +30,8 @@ public class GameManager : MonoBehaviour
         stageIndex++;
         Stages[stageIndex].SetActive(true);
         PlayerReposition();
+
+        UIStage.text = "STAGE " + (stageIndex + 1).ToString();
         }
 
         else{ //Game Clear
@@ -27,6 +40,9 @@ public class GameManager : MonoBehaviour
         //Result UI
         Debug.Log("게임 클리어!");
         //Restart Button UI
+        Text btnText = RestartBtn.GetComponentInChildren<Text>();
+        btnText.text = "Clear!";
+        RestartBtn.SetActive(true);
 
         }
         //Calculate Point
@@ -38,14 +54,18 @@ public class GameManager : MonoBehaviour
     public void HealthDown(){
         if(health > 1){
             health--;
+            UIhealth[health].color = new Color(1, 0, 0, 0.4f);
         }
         else{
+            //All health UI off
+            UIhealth[0].color = new Color(1, 0, 0, 0.4f);
             //Player Death Effect
             player.OnDie();
             health = 0;
             //Result UI
             Debug.Log("플레이어가 죽었습니다!");
             //Retry Button UI
+            RestartBtn.SetActive(true);
 
         }
     }
@@ -69,4 +89,9 @@ public class GameManager : MonoBehaviour
     player.transform.position = new Vector3(-5.65f, -0.87f, -1);
     player.VelocityZero();
     }
+
+    public void Restart(){
+        SceneManager.LoadScene(0);
+    }
 }
+
