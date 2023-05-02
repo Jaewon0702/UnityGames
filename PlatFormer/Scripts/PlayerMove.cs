@@ -5,22 +5,29 @@ using UnityEngine;
 public class PlayerMove : MonoBehaviour
 {
     public GameManager gameManager;
+    public AudioClip audioJump;
+    public AudioClip audioAttack;
+    public AudioClip audioDamaged;
+    public AudioClip audioItem;
+    public AudioClip audioDie;
+    public AudioClip audioFinish;
+
+    public float maxSpeed;
+    public float jumpPower;
+    
     Rigidbody2D rigid;
     SpriteRenderer spriteRenderer;
     Animator anim;
     BoxCollider2D Boxcollider;
-    
-    public float maxSpeed;
-    public float jumpPower;
+    AudioSource audioSource;
 
-    // Start is called before the first frame update
     void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
         Boxcollider = GetComponent<BoxCollider2D>();
-       
+        audioSource = GetComponent<AudioSource>();
     }
 
     void Update()
@@ -29,6 +36,7 @@ public class PlayerMove : MonoBehaviour
         if(Input.GetButtonDown("Jump") && !anim.GetBool("isJumping")){
             rigid.AddForce(Vector2.up * jumpPower, ForceMode2D.Impulse);
             anim.SetBool("isJumping", true);
+            PlaySound("JUMP");
 
         }
         //Stop Speed
@@ -120,10 +128,16 @@ public class PlayerMove : MonoBehaviour
 
             //Deactive Item
             collision.gameObject.SetActive(false);
+
+            //Get Item Sound
+            PlaySound("ITEM");
         }
         else if(collision.gameObject.tag == "Finish"){
             //Next stage
             gameManager.NextStage();
+
+            //Finish Sound
+            PlaySound("ITEM");
 
         }
         
@@ -146,6 +160,9 @@ public class PlayerMove : MonoBehaviour
         //Animation
         anim.SetTrigger("doDamaged");
 
+        //Damage Sound
+        PlaySound("DAMAGE");
+
         Invoke("OffDamaged", 1);
     }
 
@@ -166,7 +183,8 @@ public class PlayerMove : MonoBehaviour
         EnemyMove enemymove = enemy.GetComponent<EnemyMove>();
         enemymove.EOnDamaged();
 
-
+        //Attack Sound
+        PlaySound("ATTACK");
 
     }
 
@@ -183,19 +201,37 @@ public class PlayerMove : MonoBehaviour
         //Death effect jump
         rigid.AddForce(Vector2.up * 4, ForceMode2D.Impulse);
 
+        //Die Sound
+        PlaySound("DIE");
+
     }
 
     public void VelocityZero(){
         rigid.velocity = Vector2.zero; 
     }
 
+     void PlaySound(string action){
+        switch(action){
+            case "JUMP" :
+                audioSource.clip = audioJump;
+                break;
+            case "ATTACK" :
+                audioSource.clip =  audioAttack;
+                break;
+            case "DAMAGED" :
+                audioSource.clip = audioDamaged;
+                break;
+            case "ITEM" :
+                audioSource.clip = audioItem;
+                break;
+            case "DIE" :
+                audioSource.clip = audioDie;
+                break;
+            case "FINISH" :
+                audioSource.clip = audioFinish;
+                break;
+        }
+        audioSource.Play();
+    }
+
 }
-
-
- 
-
-
-
-
- 
-
