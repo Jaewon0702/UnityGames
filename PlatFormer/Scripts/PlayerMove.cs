@@ -106,6 +106,12 @@ public class PlayerMove : MonoBehaviour
             else if(collision.gameObject.tag == "Spike"){
                 OnDamaged(collision.transform.position);
             }
+            //Hidden Trap
+            else if(collision.gameObject.tag == "HiddenSpike"){
+                OnDamaged(collision.transform.position);
+                gameManager.ChangeColor();
+
+                }
         }
 
     void OnTriggerEnter2D(Collider2D collision){
@@ -235,3 +241,6 @@ public class PlayerMove : MonoBehaviour
     }
 
 }
+
+
+
