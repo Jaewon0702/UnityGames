@@ -17,6 +17,7 @@ public class GameManager : MonoBehaviour
     public Text UIPoint;
     public Text UIStage;
     public GameObject RestartBtn;
+    public GameObject Trap;
 
     void Update(){
        UIPoint.text = (totalPoint + stagePoint).ToString();
@@ -94,5 +95,9 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1;
         SceneManager.LoadScene(0);
     }
-}
 
+    public void ChangeColor(){
+        SpriteRenderer Col =  Trap.GetComponent<SpriteRenderer>();
+        Col.color = new Color(1, 1, 1, 1);
+    }
+}
