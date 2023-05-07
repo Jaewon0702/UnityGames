@@ -169,7 +169,7 @@ public class PlayerMove : MonoBehaviour
         //Damage Sound
         PlaySound("DAMAGE");
 
-        Invoke("OffDamaged", 1);
+        Invoke("OffDamaged", 2);
     }
 
     void OffDamaged(){
@@ -224,7 +224,7 @@ public class PlayerMove : MonoBehaviour
             case "ATTACK" :
                 audioSource.clip =  audioAttack;
                 break;
-            case "DAMAGED" :
+            case "DAMAGE" :
                 audioSource.clip = audioDamaged;
                 break;
             case "ITEM" :
@@ -241,6 +241,4 @@ public class PlayerMove : MonoBehaviour
     }
 
 }
-
-
 
