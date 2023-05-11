@@ -6,6 +6,7 @@ public class PlayerAction : MonoBehaviour
 {
     public float speed;
 
+    public GameManager manager;
     float h;
     float v;
     bool isHorizonMove;
@@ -26,14 +27,14 @@ public class PlayerAction : MonoBehaviour
     void Update()
     {
         //Move Value
-        h = Input.GetAxisRaw("Horizontal");
-        v = Input.GetAxisRaw("Vertical");
+        h = manager.isAction ? 0 : Input.GetAxisRaw("Horizontal");
+        v = manager.isAction ? 0 : Input.GetAxisRaw("Vertical");
 
         //Check Button Down & Up
-        bool hDown = Input.GetButtonDown("Horizontal");
-        bool vDown = Input.GetButtonDown("Vertical");
-        bool hUp = Input.GetButtonUp("Horizontal");
-        bool vUp = Input.GetButtonUp("Vertical");
+        bool hDown = manager.isAction ? false : Input.GetButtonDown("Horizontal");
+        bool vDown = manager.isAction ? false : Input.GetButtonDown("Vertical");
+        bool hUp = manager.isAction ? false : Input.GetButtonUp("Horizontal");
+        bool vUp = manager.isAction ? false : Input.GetButtonUp("Vertical");
 
         //Check Horizontal Move
         if(hDown){
@@ -76,7 +77,7 @@ public class PlayerAction : MonoBehaviour
 
         //Scan Object
         if(Input.GetButtonDown("Jump") && scanObject != null){
-            Debug.Log("This is : " + scanObject.name);
+            manager.Action(scanObject); 
         }
         
         
@@ -103,15 +104,3 @@ public class PlayerAction : MonoBehaviour
     }
 }
 
-        
-        
-
-    }
-
-    void FixedUpdate(){
-        //Move
-        Vector2 moveVec = isHorizonMove ? new Vector2(h, 0) : new Vector2(0, v);
-        rigid.velocity = moveVec * speed;
-
-    }
-}
