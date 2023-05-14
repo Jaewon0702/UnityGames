@@ -9,19 +9,38 @@ public class GameManager : MonoBehaviour
     public Text talkText;
     public GameObject scanObject;
     public bool isAction;
+    public TalkManager talkMamager;
+    public int talkIndex;
+    
 
     public void Action(GameObject scanObj)
     { 
-        if(isAction){  //Exit Action
-            isAction = false;
-        }
-        else{ //Entet Action
-            isAction = true;
-            scanObject = scanObj;
-            talkText.text = "This is " + scanObj.name + ".";
-            
-        }
+        scanObject = scanObj;
+        ObjData ObjData = scanObject.GetComponent<ObjData>();
+        Talk(ObjData.id, ObjData.isNpc);       
+        
         
        talkPanel.SetActive(isAction);
     }
+
+    void Talk(int id, bool isNpc){
+        string talkData = talkMamager.GetTalk(id, talkIndex);
+        if(talkData == null){ // When talk is done
+            isAction = false;
+            talkIndex = 0;
+            return; // void 함수에서 강제 종료 역할.
+
+    }
+
+        if(isNpc){
+            talkText.text = talkData;
+        }
+        else{
+            talkText.text = talkData;
+        }
+
+        isAction = true;
+        talkIndex++;
+    }   
 }
+
