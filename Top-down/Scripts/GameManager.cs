@@ -9,8 +9,9 @@ public class GameManager : MonoBehaviour
     public Text talkText;
     public GameObject scanObject;
     public bool isAction;
-    public TalkManager talkMamager;
+    public TalkManager talkManager;
     public int talkIndex;
+    public Image portraitImg;
     
 
     public void Action(GameObject scanObj)
@@ -24,7 +25,7 @@ public class GameManager : MonoBehaviour
     }
 
     void Talk(int id, bool isNpc){
-        string talkData = talkMamager.GetTalk(id, talkIndex);
+        string talkData = talkManager.GetTalk(id, talkIndex);
         if(talkData == null){ // When talk is done
             isAction = false;
             talkIndex = 0;
@@ -33,14 +34,19 @@ public class GameManager : MonoBehaviour
     }
 
         if(isNpc){
-            talkText.text = talkData;
+            talkText.text = talkData.Split(':')[0];
+
+            portraitImg.sprite = talkManager.GetPortrait(id, int.Parse(talkData.Split(':')[1]));
+            portraitImg.color = new Color(1, 1, 1, 1);
         }
         else{
             talkText.text = talkData;
+            portraitImg.color = new Color(1, 1, 1, 0);
         }
 
         isAction = true;
         talkIndex++;
     }   
 }
+
 
