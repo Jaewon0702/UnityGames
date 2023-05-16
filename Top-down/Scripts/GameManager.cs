@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     public GameObject scanObject;
     public bool isAction;
     public TalkManager talkManager;
+    public QuestManager questManager;
     public int talkIndex;
     public Image portraitImg;
     
@@ -25,14 +26,20 @@ public class GameManager : MonoBehaviour
     }
 
     void Talk(int id, bool isNpc){
-        string talkData = talkManager.GetTalk(id, talkIndex);
-        if(talkData == null){ // When talk is done
+
+        //Set Talk Data
+        int questTalkIndex = questManager.GetQuestTalkIndex(id);
+        string talkData = talkManager.GetTalk(id + questTalkIndex , talkIndex);
+
+        // When talk is done
+        if(talkData == null){ 
             isAction = false;
             talkIndex = 0;
+           //questManager.CheckQuest();
             return; // void 함수에서 강제 종료 역할.
 
     }
-
+        //Continue Talk
         if(isNpc){
             talkText.text = talkData.Split(':')[0];
 
@@ -48,5 +55,6 @@ public class GameManager : MonoBehaviour
         talkIndex++;
     }   
 }
+
 
 
