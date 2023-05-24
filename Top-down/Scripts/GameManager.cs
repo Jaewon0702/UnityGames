@@ -1,60 +1,75 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
-public class GameManager : MonoBehaviour
+public class QuestManager : MonoBehaviour
 {
-    public GameObject talkPanel;
-    public Text talkText;
-    public GameObject scanObject;
-    public bool isAction;
-    public TalkManager talkManager;
-    public QuestManager questManager;
-    public int talkIndex;
-    public Image portraitImg;
+    public int questId;
+    public int questActionIndex; //Order of Quest Talk
+    public GameObject[] questObject;
+
+    Dictionary<int, QuestData> questList;
+
+    void Awake()
+    {
+        questList = new Dictionary<int, QuestData>();    
+        GenerateData();
+    }
+
+
+    void GenerateData()
+    {
+        questList.Add(10, new QuestData("Talking to Villagers", new int[]{1000, 2000})); //new int[]안에는 quest와 연관된 Npc의 Id가 입력되어 있음.
+        questList.Add(20, new QuestData("Finding Ludo's Coin", new int[]{5000, 2000}));
+        questList.Add(30, new QuestData("Quest All Clear!", new int[]{0}));
+
+    }
+
+    public int GetQuestTalkIndex(int id){
+        return questId + questActionIndex;
+    }
+
+    public string CheckQuest(int id){
     
-
-    public void Action(GameObject scanObj)
-    { 
-        scanObject = scanObj;
-        ObjData ObjData = scanObject.GetComponent<ObjData>();
-        Talk(ObjData.id, ObjData.isNpc);       
-        
-        
-       talkPanel.SetActive(isAction);
-    }
-
-    void Talk(int id, bool isNpc){
-
-        //Set Talk Data
-        int questTalkIndex = questManager.GetQuestTalkIndex(id);
-        string talkData = talkManager.GetTalk(id + questTalkIndex , talkIndex);
-
-        // When talk is done
-        if(talkData == null){ 
-            isAction = false;
-            talkIndex = 0;
-           //questManager.CheckQuest();
-            return; // void 함수에서 강제 종료 역할.
-
-    }
-        //Continue Talk
-        if(isNpc){
-            talkText.text = talkData.Split(':')[0];
-
-            portraitImg.sprite = talkManager.GetPortrait(id, int.Parse(talkData.Split(':')[1]));
-            portraitImg.color = new Color(1, 1, 1, 1);
-        }
-        else{
-            talkText.text = talkData;
-            portraitImg.color = new Color(1, 1, 1, 0);
+        //Next Quest Target
+        if(id == questList[questId].npcId[questActionIndex]){ //QuestData 함수의 npcId 배열(new int[]{1000, 2000}))의 Index 
+        //Ex) questActionIndex == 0이면 0번째인 1000반환
+            //순서에 맞게 대화했을 때만 QuestActionIndex++;
+            questActionIndex++;
         }
 
-        isAction = true;
-        talkIndex++;
-    }   
+        //Control Quest Object
+         ControlObject();
+
+        if(questActionIndex == questList[questId].npcId.Length){
+            NextQuest();
+        }
+        //Quest Name
+        return questList[questId].questName;
+    }
+    void NextQuest(){
+        questId += 10;
+        questActionIndex = 0;
+    }
+
+    void ControlObject(){
+        switch(questId){
+            case 10:
+                if(questActionIndex == 2){
+                    questObject[0].SetActive(true);
+                }
+            break;
+            case 20:
+                if(questActionIndex == 1){
+                    questObject[0].SetActive(false);
+                }
+            break;
+        }
+    }
+
+
 }
+
 
 
 
