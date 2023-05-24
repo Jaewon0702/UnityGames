@@ -29,13 +29,13 @@ public class GameManager : MonoBehaviour
 
         //Set Talk Data
         int questTalkIndex = questManager.GetQuestTalkIndex(id);
-        string talkData = talkManager.GetTalk(id + questTalkIndex , talkIndex);
+        string talkData = talkManager.GetTalk(id + questTalkIndex , talkIndex);//Quest Talk Data Id = NpcId + QuestId
 
         // When talk is done
         if(talkData == null){ 
             isAction = false;
             talkIndex = 0;
-           //questManager.CheckQuest();
+           Debug.Log(questManager.CheckQuest(id));
             return; // void 함수에서 강제 종료 역할.
 
     }
@@ -55,6 +55,7 @@ public class GameManager : MonoBehaviour
         talkIndex++;
     }   
 }
+
 
 
 
