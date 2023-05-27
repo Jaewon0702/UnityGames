@@ -56,6 +56,16 @@ public class TalkManager : MonoBehaviour
    }
 
    public string GetTalk(int id, int talkIndex){
+
+      if(!talkData.ContainsKey(id)){
+
+         if(!talkData.ContainsKey(id - id % 10))
+            return GetTalk(id - id % 100, talkIndex); //Get First Talk
+
+         else
+             return GetTalk(id - id % 10, talkIndex); //Get First Quest Talk 
+         
+      }
       
       if(talkIndex == talkData[id].Length){
          return null;  
