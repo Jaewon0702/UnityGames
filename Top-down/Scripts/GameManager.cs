@@ -8,7 +8,9 @@ public class GameManager : MonoBehaviour
     public Animator talkPanel;
     public Animator portraitAnim;
     public Text talkText;
+    public Text questText;
     public GameObject scanObject;
+    public GameObject menuSet;
     public bool isAction;
     public TalkManager talkManager;
     public QuestManager questManager;
@@ -17,7 +19,19 @@ public class GameManager : MonoBehaviour
     public Sprite prevPortrait;
 
     void Start() {
-    Debug.Log(questManager.CheckQuest());    
+    questText.text = questManager.CheckQuest();    
+    }
+
+    void Update(){
+
+    //Sub Menu
+        if(Input.GetButtonDown("Cancel")){
+            if(menuSet.activeSelf)
+                menuSet.SetActive(false);
+            else
+                menuSet.SetActive(true);
+
+        }
     }
     
 
@@ -41,7 +55,7 @@ public class GameManager : MonoBehaviour
         if(talkData == null){ 
             isAction = false;
             talkIndex = 0;
-           Debug.Log(questManager.CheckQuest(id));
+            questText.text = questManager.CheckQuest(id);
             return; // void 함수에서 강제 종료 역할.
 
     }
@@ -65,6 +79,9 @@ public class GameManager : MonoBehaviour
         isAction = true;
         talkIndex++;
     }   
-}
 
+    public void GameExit(){
+        Application.Quit();
+    }
+}
 
