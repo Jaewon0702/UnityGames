@@ -57,17 +57,19 @@ public string CheckQuest(){
         questActionIndex = 0;
     }
 
-    void ControlObject(){
+    public void ControlObject(){
         switch(questId){
-            case 10:
-                if(questActionIndex == 2){
+            case 10: //questid 10이 시작되었을 때
+                if(questActionIndex == 2)
                     questObject[0].SetActive(true);
-                }
+                
             break;
             case 20:
-                if(questActionIndex == 1){
+                if(questActionIndex == 0)
+                    questObject[0].SetActive(true);
+                if(questActionIndex == 1)
                     questObject[0].SetActive(false);
-                }
+                
             break;
         }
     }
