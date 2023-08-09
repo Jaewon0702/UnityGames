@@ -28,12 +28,18 @@ public class GameManager : MonoBehaviour
 
     //Sub Menu
         if(Input.GetButtonDown("Cancel")){
-            if(menuSet.activeSelf)
-                menuSet.SetActive(false);
-            else
-                menuSet.SetActive(true);
-
+            SubMenuActive();
+          
         }
+    }
+
+    public void SubMenuActive()
+    {
+        if(menuSet.activeSelf)
+            menuSet.SetActive(false);
+        else
+            menuSet.SetActive(true);
+
     }
     
 
@@ -89,8 +95,7 @@ public class GameManager : MonoBehaviour
        PlayerPrefs.SetInt("QuestId", questManager.questId);//Quest Id
        PlayerPrefs.SetInt("QuestActionIndex", questManager.questActionIndex); //Quest Action Index
        PlayerPrefs.Save();
-
-        menuSet.SetActive(false);
+       menuSet.SetActive(false);
     }
 
     public void GameLoad()
