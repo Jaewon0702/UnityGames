@@ -12,6 +12,11 @@ public class PlayerBall : MonoBehaviour
     bool isHiddenJump;
     public int Score;
     public GameManagerLogic manager;
+    public GameObject CrashedScreen00;
+    public float befpos = -34;
+
+    public float strength = 100;
+    
 
     new AudioSource audio;
 
@@ -42,6 +47,10 @@ public class PlayerBall : MonoBehaviour
             isHiddenJump = true;
             rigid.AddForce(Vector3.up * JumpPower * 2.1f, ForceMode.Impulse);
         }
+
+        else if(Input.GetButtonDown("Submit")){
+            CrashedScreen00.SetActive(true);
+         }
         
     }
     void FixedUpdate()
@@ -55,12 +64,31 @@ public class PlayerBall : MonoBehaviour
         
         if(collision.gameObject.tag == "Floor"){
             isJump = false; //바닥에 닿으면 점프 중이 아니다
+            OnDamaged(collision.transform.position);
             }
 
         else if(collision.gameObject.tag == "HiddenFloor"){
             isHiddenJump = false;
+
+        }
+        else if(collision.gameObject.tag == "Enemy"){
+            OnDamaged(collision.transform.position);
+            CrashedScreen00.SetActive(true);
+
         }
 
+       
+
+    }
+
+      void OnDamaged(Vector3 targetPos){
+        float heig = befpos - targetPos.y;
+        befpos = transform.position.y; // 높은 곳에서 폰이 떨어지면 데미지를 입는다.
+        Debug.Log(heig);
+
+        if(heig > strength){
+            CrashedScreen00.SetActive(true);
+        }
     }
 
     void OnTriggerEnter(Collider other){
