@@ -13,10 +13,10 @@ public class PlayerBall : MonoBehaviour
     public int Score;
     public GameManagerLogic manager;
     public GameObject CrashedScreen00;
-    public float befpos = -34;
-
-    public float strength = 100;
-    
+    public GameObject CrashedScreen01;
+    public GameObject CrashedScreen02;
+    public float befpos;
+    public float strength;
 
     new AudioSource audio;
 
@@ -24,6 +24,8 @@ public class PlayerBall : MonoBehaviour
     private void Awake() {
         isJump = false;
         isHiddenJump = false;
+        befpos = -34;
+        strength = 10;
         rigid = GetComponent<Rigidbody>();
         audio = GetComponent<AudioSource>();
 
@@ -84,10 +86,13 @@ public class PlayerBall : MonoBehaviour
       void OnDamaged(Vector3 targetPos){
         float heig = befpos - targetPos.y;
         befpos = transform.position.y; // 높은 곳에서 폰이 떨어지면 데미지를 입는다.
-        Debug.Log(heig);
+        //Debug.Log(heig);
 
         if(heig > strength){
-            CrashedScreen00.SetActive(true);
+            manager.HealthDown(50);
+            //CrashedScreen00.SetActive(true);
+
+            //여기에서 GameManager의 Helthdown 함수가 실행
         }
     }
 
