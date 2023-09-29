@@ -7,7 +7,6 @@ using UnityEngine.UI;
 public class GameManagerLogic : MonoBehaviour{
     public int totalItemCount;
     public int stage; // 매 Scene마다 숫자를 바꿔야함!!
-    public Text stageCountText;
     public Text playerCountText;
 
      public PlayerBall player;
@@ -17,52 +16,55 @@ public class GameManagerLogic : MonoBehaviour{
     public GameObject CrashedScreen02;
 
     void Awake(){
-        health = 200;
+        health = 3;
+        playerCountText.text = "X 3";
 
-        stageCountText.text = "/ " + totalItemCount.ToString();
 
     }
 
-    public void GetItemCount(int count){
+    public void GetItemCount(float count){
 
-        playerCountText.text = count.ToString();
+        playerCountText.text = "X " + (count).ToString();
 
 
     }
 
      public void HealthDown(float damage){ //Heath가 떨어짐에 따라 폰에 점점 금이 간다.
 
-        if(health > 150 && damage == 50){
+        if(health > 3 + 1 && damage == 1){
             health = health - damage;
         }
 
-        else if(health <= 150 && health > 100){
+        else if(health == 3 + 1){
             health = health - damage;
             CrashedScreen00.SetActive(true);
         }
 
-        else if(health <= 100 && health > 50){
+        else if(health == 2 + 1){
             health = health - damage;
             CrashedScreen00.SetActive(false);
             CrashedScreen01.SetActive(true);
         }
 
-        else if(health <= 50 && health > 1){
+        else if(health == 1 + 1){
             health = health - damage;
             CrashedScreen01.SetActive(false);
             CrashedScreen02.SetActive(true);
         }
 
+        else if(health <= 0){
+            health = 0;
+        }
+
         else{
+            health = health - damage;
             //All health UI off
             //UIhealth[0].color = new Color(1, 0, 0, 0.4f);
             //Player Death Effect
            // player.OnDie();
             //health = 0;
-            Debug.Log(health);
+            Debug.Log("Helath: " + health);
             //Result UI
-            CrashedScreen01.SetActive(false);
-            CrashedScreen02.SetActive(true);
             Debug.Log("플레이어가 죽었습니다!");
             //Retry Button UI
             //RestartBtn.SetActive(true);
