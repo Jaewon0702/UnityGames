@@ -19,13 +19,16 @@ public class PlayerBall : MonoBehaviour
     public float strength;
 
     new AudioSource audio;
+    public AudioClip audioItem;
+    public AudioClip audioDamaged;
+    public AudioClip audioFinish;
 
 
     private void Awake() {
         isJump = false;
         isHiddenJump = false;
         befpos = -34;
-        strength = 10;
+        strength = 50;
         rigid = GetComponent<Rigidbody>();
         audio = GetComponent<AudioSource>();
 
@@ -50,9 +53,6 @@ public class PlayerBall : MonoBehaviour
             rigid.AddForce(Vector3.up * JumpPower * 2.1f, ForceMode.Impulse);
         }
 
-        else if(Input.GetButtonDown("Submit")){
-            CrashedScreen00.SetActive(true);
-         }
         
     }
     void FixedUpdate()
@@ -75,7 +75,6 @@ public class PlayerBall : MonoBehaviour
         }
         else if(collision.gameObject.tag == "Enemy"){
             OnDamaged(collision.transform.position);
-            CrashedScreen00.SetActive(true);
 
         }
 
@@ -88,9 +87,10 @@ public class PlayerBall : MonoBehaviour
         befpos = transform.position.y; // 높은 곳에서 폰이 떨어지면 데미지를 입는다.
         //Debug.Log(heig);
 
-        if(heig > strength){
-            manager.HealthDown(50);
-            //CrashedScreen00.SetActive(true);
+        if(heig > strength){ // Damaged
+            manager.HealthDown(1);
+            manager.GetItemCount(manager.health);
+            PlaySound("DAMAGED");
 
             //여기에서 GameManager의 Helthdown 함수가 실행
         }
@@ -99,10 +99,10 @@ public class PlayerBall : MonoBehaviour
     void OnTriggerEnter(Collider other){
 
         if(other.tag == "Item"){
-            Score++;
-            audio.Play();
+            manager.health++;
+            PlaySound("ITEM");
             other.gameObject.SetActive(false); //SetActive(bool): 오브젝트 활성화 함수
-            manager.GetItemCount(Score);
+            manager.GetItemCount(manager.health);
         }
 
         else if(other.tag == "Finish"){
@@ -122,5 +122,20 @@ public class PlayerBall : MonoBehaviour
                 //Restart
             }
         }   
+    }
+
+    void PlaySound(string action){
+        switch(action){
+            case "ITEM":
+                audio.clip = audioItem;
+                break;
+            case "DAMAGED":
+                audio.clip = audioDamaged;
+                break;
+            case "FINISH":
+                audio.clip = audioFinish;
+                break;
+        }
+        audio.Play();
     }
 }
