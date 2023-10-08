@@ -3,35 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Fracture : MonoBehaviour
-{
-    Collider[] colliders;
-    Rigidbody rigid;
+{   public GameObject pieces; 
+    public GameObject smartphone;   
     // Start is called before the first frame update
-    void Awake()
-    {
-        colliders = GetComponentsInChildren<Collider>();
-        foreach(Collider c in colliders){
-            if(c.name == "1114_Fracture") continue; //Block Parent turn off
-            c.gameObject.GetComponent<Renderer>().enabled = false;
-            rigid = c.gameObject.GetComponent<Rigidbody>();
-            rigid.constraints = (RigidbodyConstraints)126; // 126 == All constraints
-
-
-        }
-        
-    }
 
     public void OnFracture(){
-        GetComponent<Renderer>().enabled = false;
-        foreach(Collider c in colliders){
-            if(c.name == "1114_Fracture") continue;
-            c.gameObject.GetComponent<Renderer>().enabled = true;
-            rigid = c.gameObject.GetComponent<Rigidbody>();
-            rigid.constraints = (RigidbodyConstraints)0;
-        }
-
+        smartphone.GetComponent<Renderer>().enabled = false; //enabled and SetActive has Same Effct
+        pieces.SetActive(true);
+        transform.position =  GameObject.FindGameObjectWithTag("Player").transform.position; //Same Position with Player
+        transform.localRotation = GameObject.FindGameObjectWithTag("Player").transform.localRotation;//Same Rotation with Player 
     }
-
-
-    
 }
+
