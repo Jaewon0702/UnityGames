@@ -8,7 +8,7 @@ public class GameManagerLogic : MonoBehaviour{
     public int totalItemCount;
     public int stage; // 매 Scene마다 숫자를 바꿔야함!!
     public Text playerCountText;
-    public PlayerBall player;
+    //public PlayerBall player;
     public Fracture fracture;
     public float health;
     public GameObject CrashedScreen00;
@@ -18,7 +18,7 @@ public class GameManagerLogic : MonoBehaviour{
     void Awake(){
         health = 3;
         playerCountText.text = "X 3";
-        fracture.OnFracture();
+        //fracture.OnFracture();
     }
 
     public void GetItemCount(float count){
@@ -65,6 +65,7 @@ public class GameManagerLogic : MonoBehaviour{
             Debug.Log("Helath: " + health);
             //Result UI
             Debug.Log("플레이어가 죽었습니다!");
+            CrashedScreen02.SetActive(false);
             fracture.OnFracture();
 
 
@@ -83,5 +84,6 @@ public class GameManagerLogic : MonoBehaviour{
     }
 
 }
+
 
 
