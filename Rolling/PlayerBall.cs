@@ -12,9 +12,6 @@ public class PlayerBall : MonoBehaviour
     bool isHiddenJump;
     public int Score;
     public GameManagerLogic manager;
-    public GameObject CrashedScreen00;
-    public GameObject CrashedScreen01;
-    public GameObject CrashedScreen02;
     public float befpos;
     public float strength;
 
@@ -31,7 +28,6 @@ public class PlayerBall : MonoBehaviour
         strength = 50;
         rigid = GetComponent<Rigidbody>();
         audio = GetComponent<AudioSource>();
-
         
     }
     // Start is called before the first frame update
@@ -88,7 +84,7 @@ public class PlayerBall : MonoBehaviour
         //Debug.Log(heig);
 
         if(heig > strength){ // Damaged
-            manager.HealthDown(1);
+            manager.HealthUpDown(1);
             manager.GetItemCount(manager.health);
             PlaySound("DAMAGED");
 
@@ -99,10 +95,11 @@ public class PlayerBall : MonoBehaviour
     void OnTriggerEnter(Collider other){
 
         if(other.tag == "Item"){
-            manager.health++;
+            //manager.health++;
+            manager.HealthUpDown(-1);
+             manager.GetItemCount(manager.health);
             PlaySound("ITEM");
             other.gameObject.SetActive(false); //SetActive(bool): 오브젝트 활성화 함수
-            manager.GetItemCount(manager.health);
         }
 
         else if(other.tag == "Finish"){
