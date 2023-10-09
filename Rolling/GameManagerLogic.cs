@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Analytics;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -13,12 +14,11 @@ public class GameManagerLogic : MonoBehaviour{
     public float health;
     public GameObject CrashedScreen00;
     public GameObject CrashedScreen01;
-    public GameObject CrashedScreen02;
-
+    public GameObject CrashedScreen02; 
+    public GameObject Screen;
     void Awake(){
-        health = 3;
-        playerCountText.text = "X 3";
-        //fracture.OnFracture();
+        health = 5;
+        playerCountText.text = "X 5"; //Initial setup Health
     }
 
     public void GetItemCount(float count){
@@ -28,33 +28,26 @@ public class GameManagerLogic : MonoBehaviour{
 
     }
 
-     public void HealthDown(float damage){ //Heath가 떨어짐에 따라 폰에 점점 금이 간다.
-
-        if(health > 3 + 1 && damage == 1){
-            health = health - damage;
-        }
-
+     public void HealthUpDown(float damage){ //Heath가 떨어짐에 따라 폰에 점점 금이 간다.
+     if(damage > 0){
+        if(health > 3 + 1 && damage == 1) health = health - damage;
+        
         else if(health == 3 + 1){
             health = health - damage;
-            CrashedScreen00.SetActive(true);
+            CrashedScreen00.SetActive(true);       
         }
 
         else if(health == 2 + 1){
             health = health - damage;
-            CrashedScreen00.SetActive(false);
             CrashedScreen01.SetActive(true);
         }
 
         else if(health == 1 + 1){
             health = health - damage;
-            CrashedScreen01.SetActive(false);
-            CrashedScreen02.SetActive(true);
+           CrashedScreen02.SetActive(true);
         }
-
-        else if(health <= 0){
-            health = 0;
-        }
-
+        else if(health <= 0) health = 0;
+        
         else{
             health = health - damage;
             //All health UI off
@@ -62,16 +55,38 @@ public class GameManagerLogic : MonoBehaviour{
             //Player Death Effect
            // player.OnDie();
             //health = 0;
+            Screen.SetActive(false);
             Debug.Log("Helath: " + health);
             //Result UI
             Debug.Log("플레이어가 죽었습니다!");
-            CrashedScreen02.SetActive(false);
             fracture.OnFracture();
-
-
+            //Time.timeScale = 0;
             //Retry Button UI
             //RestartBtn.SetActive(true);
 
+        }
+    }
+    else{
+        if(health > 3 + 1 && damage == -1) health = health - damage;
+    
+        else if(health == 3 + 1) health = health - damage;
+
+        else if(health == 2 + 1){
+            health = health - damage;
+            CrashedScreen00.SetActive(false);
+            }
+
+        else if(health == 1 + 1){
+            health = health - damage;
+            CrashedScreen01.SetActive(false);
+            }
+
+        else if(health <= 0) health = 0;
+        
+        else{
+            CrashedScreen02.SetActive(false);
+            health = health - damage;
+            }
         }
     }
 
@@ -84,6 +99,7 @@ public class GameManagerLogic : MonoBehaviour{
     }
 
 }
+
 
 
 
