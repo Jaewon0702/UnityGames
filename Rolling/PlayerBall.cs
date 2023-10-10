@@ -14,6 +14,9 @@ public class PlayerBall : MonoBehaviour
     public GameManagerLogic manager;
     public float befpos;
     public float strength;
+    Vector3 moveVec;
+
+    public VariableJoystick joy;
 
     new AudioSource audio;
     public AudioClip audioItem;
@@ -39,23 +42,41 @@ public class PlayerBall : MonoBehaviour
     // Update is called once per frame
 
     void Update() {
+        //1. Jump when I press space bar
         if(Input.GetButtonDown("Jump") && !isJump){
             isJump = true;
             rigid.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
         }
 
-        else if(Input.GetButtonDown("Jump") && !isHiddenJump){
+        /*else if(Input.GetButtonDown("Jump") && !isHiddenJump){
             isHiddenJump = true;
             rigid.AddForce(Vector3.up * JumpPower * 2.1f, ForceMode.Impulse);
+        }*/
+        //2. Jump when I swipe up
+        else if(joy.Horizontal > 0 && !isJump){
+            isJump = true;
+            rigid.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
         }
 
         
     }
     void FixedUpdate()
     {
+        //1. Input Value
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
-        rigid.AddForce(new Vector3(h,0,v) * MovePower, ForceMode.Impulse);
+        float x = joy.Horizontal;
+        //float z = joy.Vertical;
+        //2. Move using keyboard
+        moveVec = new Vector3(h, 0, v) * MovePower;
+        rigid.AddForce(moveVec, ForceMode.Impulse);
+
+       //3. move using joystick on touch screen or mouse
+       Vector3 direction = new Vector3(x, 0, 0);
+       rigid.AddForce(direction * MovePower, ForceMode.Impulse); //ForceMode.VelocityChange
+
+       //4. Keep Move forward
+      // rigid.AddForce(new Vector3(0,0,1) * 0.4f, ForceMode.VelocityChange);
     }
 
     void OnCollisionEnter(Collision collision) { //Floor에 한 번 닿아야 점프 가능!
