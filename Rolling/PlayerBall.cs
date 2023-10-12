@@ -52,7 +52,7 @@ public class PlayerBall : MonoBehaviour
             isHiddenJump = true;
             rigid.AddForce(Vector3.up * JumpPower * 2.1f, ForceMode.Impulse);
         }*/
-        //2. Jump when I swipe up
+        //2. Jump when swipe up
         else if(joy.Horizontal > 0 && !isJump){
             isJump = true;
             rigid.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
@@ -66,13 +66,13 @@ public class PlayerBall : MonoBehaviour
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
         float x = joy.Horizontal;
-        //float z = joy.Vertical;
+        float z = joy.Vertical;
         //2. Move using keyboard
         moveVec = new Vector3(h, 0, v) * MovePower;
         rigid.AddForce(moveVec, ForceMode.Impulse);
 
        //3. move using joystick on touch screen or mouse
-       Vector3 direction = new Vector3(x, 0, 0);
+       Vector3 direction = new Vector3(x, 0, z);
        rigid.AddForce(direction * MovePower, ForceMode.Impulse); //ForceMode.VelocityChange
 
        //4. Keep Move forward
@@ -90,6 +90,11 @@ public class PlayerBall : MonoBehaviour
             isHiddenJump = false;
 
         }
+
+        else if(collision.gameObject.tag == "Obstacle"){ // Can Jump on Obstaccle
+            isJump = false;
+        }
+
         else if(collision.gameObject.tag == "Enemy"){
             OnDamaged(collision.transform.position);
 
