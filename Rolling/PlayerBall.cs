@@ -33,14 +33,8 @@ public class PlayerBall : MonoBehaviour
         audio = GetComponent<AudioSource>();
         
     }
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
 
     // Update is called once per frame
-
     void Update() {
         //1. Jump when I press space bar
         if(Input.GetButtonDown("Jump") && !isJump){
@@ -51,12 +45,12 @@ public class PlayerBall : MonoBehaviour
         /*else if(Input.GetButtonDown("Jump") && !isHiddenJump){
             isHiddenJump = true;
             rigid.AddForce(Vector3.up * JumpPower * 2.1f, ForceMode.Impulse);
-        }*/
+        }
         //2. Jump when swipe up
-        else if(joy.Horizontal > 0 && !isJump){
+        /*else if(joy.Horizontal > 0 && !isJump){
             isJump = true;
             rigid.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
-        }
+        }*/
 
         
     }
@@ -83,7 +77,7 @@ public class PlayerBall : MonoBehaviour
         
         if(collision.gameObject.tag == "Floor"){
             isJump = false; //바닥에 닿으면 점프 중이 아니다
-            OnDamaged(collision.transform.position);
+            OnDamaged(collision.transform.position, false);
             }
 
         else if(collision.gameObject.tag == "HiddenFloor"){
@@ -96,20 +90,18 @@ public class PlayerBall : MonoBehaviour
         }
 
         else if(collision.gameObject.tag == "Enemy"){
-            OnDamaged(collision.transform.position);
+            OnDamaged(collision.transform.position, true);
 
         }
-
-       
-
     }
 
-      void OnDamaged(Vector3 targetPos){
+    // Falled from high or Bumped into enemy, Get damage
+      void OnDamaged(Vector3 targetPos, bool bumped){
         float heig = befpos - targetPos.y;
         befpos = transform.position.y; // 높은 곳에서 폰이 떨어지면 데미지를 입는다.
         //Debug.Log(heig);
 
-        if(heig > strength){ // Damaged
+        if(heig > strength || bumped == true){ // Damaged
             manager.HealthUpDown(1);
             manager.GetItemCount(manager.health);
             PlaySound("DAMAGED");
@@ -120,34 +112,33 @@ public class PlayerBall : MonoBehaviour
 
     void OnTriggerEnter(Collider other){
 
-        if(other.tag == "Item"){
+        if(other.tag == "Item"){ //1. Get Item Logic
             //manager.health++;
             manager.HealthUpDown(-1);
-             manager.GetItemCount(manager.health);
+            manager.GetItemCount(manager.health);
             PlaySound("ITEM");
             other.gameObject.SetActive(false); //SetActive(bool): 오브젝트 활성화 함수
         }
 
-        else if(other.tag == "Finish"){
+        else if(other.tag == "Finish"){ //2. Finish Logic
 
             if(Score == manager.totalItemCount){
                 if(manager.stage == 2){
                     SceneManager.LoadScene(0);
                 }
                 else{
-                    SceneManager.LoadScene(manager.stage + 1); //Game Clear! && Nest Stage
+                    SceneManager.LoadScene(manager.stage + 1); //3. Game Clear! && Nest Stage
                 }
 
             }
             
             else {
-                SceneManager.LoadScene(manager.stage);
-                //Restart
+                SceneManager.LoadScene(manager.stage); //4. Restart
             }
         }   
     }
 
-    void PlaySound(string action){
+    void PlaySound(string action){ // Sound Set Function
         switch(action){
             case "ITEM":
                 audio.clip = audioItem;
