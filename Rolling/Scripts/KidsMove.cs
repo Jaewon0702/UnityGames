@@ -36,17 +36,22 @@ public class KidsMove : MonoBehaviour
         rigid.MoveRotation(moveQuat); 
 
         // 3. Check the Kid on the Floor
-       Vector3 frontVec = transform.position + new Vector3(nextMoveX, 0, nextMoveZ) * 10; //Ray in front of the player positon
+       Vector3 frontVec = transform.position + new Vector3(nextMoveX, 2, nextMoveZ) * 10; //Ray in front of the player positon
        Debug.DrawRay(frontVec, -transform.up * 15, Color.red);
-       bool CollisioDetection = Physics.Raycast(frontVec, -transform.up, out rayHit, LayerMask.GetMask("Floor")); // Detect Kid on Floor
+       bool CollisioDetectionF = Physics.Raycast(frontVec, -transform.up * 3, out rayHit, LayerMask.GetMask("Floor")); // Detect Kid on Floor
 
        //4. Change direction if kid meets cliff
-       if(!CollisioDetection){
-           nextMoveX *= -1; // Change Direction
-           nextMoveZ *= -1;
-           CancelInvoke(); // Stop Invoke
-           Invoke("Think", 2);
-           
+       if(!CollisioDetectionF){
+           ChangeDirection();
+       }
+
+      //5. Check the kid in front of Obstacle
+       Debug.DrawRay(frontVec, transform.forward * 5, Color.red);
+       bool CollisioDetectionW = Physics.Raycast(frontVec, transform.forward, out rayHit, LayerMask.GetMask("Enemy")); // Detect Kid in front of wall
+
+       //6. Change direction if kid meets wall
+        if(CollisioDetectionW){
+            ChangeDirection();
        }
     }    
 
@@ -77,4 +82,12 @@ public class KidsMove : MonoBehaviour
         Invoke("Think", 5);
 
     }
+
+    void ChangeDirection(){
+        nextMoveX *= -1; // Change Direction
+        nextMoveZ *= -1;
+        CancelInvoke(); // Stop Invoke
+        Invoke("Think", 2);
+    }
 }
+
