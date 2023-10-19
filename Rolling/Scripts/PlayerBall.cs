@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
+using Vector3 = UnityEngine.Vector3;
 using UnityEngine.SceneManagement;
 
 public class PlayerBall : MonoBehaviour
@@ -22,7 +24,7 @@ public class PlayerBall : MonoBehaviour
     public AudioClip audioItem;
     public AudioClip audioDamaged;
     public AudioClip audioFinish;
-
+    Renderer Renderer;
 
     private void Awake() {
         isJump = false;
@@ -31,6 +33,7 @@ public class PlayerBall : MonoBehaviour
         strength = 50;
         rigid = GetComponent<Rigidbody>();
         audio = GetComponent<AudioSource>();
+        Renderer = GetComponent<Renderer>();
         
     }
 
@@ -99,15 +102,33 @@ public class PlayerBall : MonoBehaviour
       void OnDamaged(Vector3 targetPos, bool bumped){
         float heig = befpos - targetPos.y;
         befpos = transform.position.y; // 높은 곳에서 폰이 떨어지면 데미지를 입는다.
-        //Debug.Log(heig);
 
-        if(heig > strength || bumped == true){ // Damaged
+        if(heig > strength || bumped == true){ 
+            // Damaged 
             manager.HealthUpDown(1);
             manager.GetItemCount(manager.health);
+
+            //Change Layer(Immotal Active)
+            gameObject.layer = 7;
+
+            //View Alpha
+            //Renderer.material.color = new Color(0, 0, 0, 1f); // not work
+
+            //Reaction Force
+            int dirx = transform.position.x - targetPos.x > 0 ? 1 : -1;
+            int dirz = transform.position.z - targetPos.z > 0 ? 1 : -1;
+            rigid.AddForce(new Vector3(dirx, 1, dirz) * 100, ForceMode.Impulse);
             PlaySound("DAMAGED");
 
-            //여기에서 GameManager의 Helthdown 함수가 실행
+            Invoke("OffDamaged",3);
+
+
         }
+    }
+
+    void OffDamaged(){
+        gameObject.layer = 6;
+
     }
 
     void OnTriggerEnter(Collider other){
@@ -129,9 +150,7 @@ public class PlayerBall : MonoBehaviour
                 else{
                     SceneManager.LoadScene(manager.stage + 1); //3. Game Clear! && Nest Stage
                 }
-
-            }
-            
+            } 
             else {
                 SceneManager.LoadScene(manager.stage); //4. Restart
             }
