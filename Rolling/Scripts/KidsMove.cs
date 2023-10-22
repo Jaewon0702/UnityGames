@@ -14,10 +14,12 @@ public class KidsMove : MonoBehaviour
     Vector3 moveVec;
     RaycastHit rayHit;
     Animator anim;
+    KidThrow kidThrow;
     void Awake()
     {
        rigid = GetComponent<Rigidbody>();
        anim = GetComponent<Animator>();
+       kidThrow = GetComponent<KidThrow>();
        Invoke("Think", 5);
     }
 
@@ -45,14 +47,14 @@ public class KidsMove : MonoBehaviour
            ChangeDirection();
        }
 
-      //5. Check the kid in front of Obstacle
-       Debug.DrawRay(frontVec, transform.forward * 5, Color.red);
+     //5. Check the kid in front of Obstacle
+     /*  Debug.DrawRay(frontVec, transform.forward * 5, Color.red);
        bool CollisioDetectionW = Physics.Raycast(frontVec, transform.forward, out rayHit, LayerMask.GetMask("Enemy")); // Detect Kid in front of wall
 
        //6. Change direction if kid meets wall
         if(CollisioDetectionW){
-            ChangeDirection();
-       }
+            Think();
+       }*/
     }    
 
     void Think()
@@ -61,20 +63,30 @@ public class KidsMove : MonoBehaviour
         //1. Set Next Active
         nextMoveX = Random.Range(-4, 5);
         nextMoveZ = Random.Range(-4, 5);
-        nextSpeed = Random.Range(10, 30);
+        nextSpeed = Random.Range(0, 30);
         
         //2. Sprite Animation
         // Idle
         if(nextMoveX == 0 && nextMoveZ == 0) anim.SetInteger("walkSpeed", nextSpeed);
+        //Throw
+        else if(nextSpeed < 10){
+            anim.SetInteger("walkSpeed", nextSpeed);
+            anim.SetBool("isThrowing", true);
+            anim.SetBool("isRunning", false);
+            kidThrow.Throw();
+            nextSpeed = 1; // Kid stops when throwing
+        }
         // Walk
         else if(nextSpeed < 20){ 
             anim.SetInteger("walkSpeed", nextSpeed);
             anim.SetBool("isRunning", false);
+            anim.SetBool("isThrowing", false);
             }
         // Run
         else{
             anim.SetInteger("walkSpeed", nextSpeed);
             anim.SetBool("isRunning", true);
+            anim.SetBool("isThrowing", false);
             }
 
         //Recursive
@@ -90,4 +102,5 @@ public class KidsMove : MonoBehaviour
         Invoke("Think", 2);
     }
 }
+
 
