@@ -4,6 +4,7 @@ using System.Numerics;
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 using UnityEngine.SceneManagement;
+using System;
 
 public class PlayerBall : MonoBehaviour
 {
@@ -80,7 +81,7 @@ public class PlayerBall : MonoBehaviour
         
         if(collision.gameObject.tag == "Floor"){
             isJump = false; //바닥에 닿으면 점프 중이 아니다
-            OnDamaged(collision.transform.position, false);
+            OnDamaged(collision.transform.position, false,"General");
             }
 
         else if(collision.gameObject.tag == "HiddenFloor"){
@@ -93,13 +94,19 @@ public class PlayerBall : MonoBehaviour
         }
 
         else if(collision.gameObject.tag == "Enemy"){
-            OnDamaged(collision.transform.position, true);
+            OnDamaged(collision.transform.position, true, "General");
 
+        }
+        else if(collision.gameObject.tag == "SmallBomb"){
+            OnDamaged(collision.transform.position, true, "SmallBomb");
+        }
+        else if(collision.gameObject.tag == "BigBomb"){
+            OnDamaged(collision.transform.position, true, "BigBomb");
         }
     }
 
     // Falled from high or Bumped into enemy, Get damage
-      void OnDamaged(Vector3 targetPos, bool bumped){
+      void OnDamaged(Vector3 targetPos, bool bumped, string type){
         float heig = befpos - targetPos.y;
         befpos = transform.position.y; // 높은 곳에서 폰이 떨어지면 데미지를 입는다.
 
@@ -115,15 +122,21 @@ public class PlayerBall : MonoBehaviour
             //Renderer.material.color = new Color(0, 0, 0, 1f); // not work
 
             //Reaction Force
-            int dirx = transform.position.x - targetPos.x > 0 ? 1 : -1;
-            int dirz = transform.position.z - targetPos.z > 0 ? 1 : -1;
-            rigid.AddForce(new Vector3(dirx, 1, dirz) * 100, ForceMode.Impulse);
-            PlaySound("DAMAGED");
+            if(type == "General") ReactionForce(targetPos, 100);
+            else if(type == "SmallBomb") ReactionForce(targetPos, 200);
+            else if(type == "BigBomb") ReactionForce(targetPos, 300);
 
+            PlaySound("DAMAGED");
+            // no damage
             Invoke("OffDamaged",3);
 
-
         }
+    }
+
+    void ReactionForce(Vector3 targetPos, int ExplosionPower){
+        int dirx = transform.position.x - targetPos.x > 0 ? 1 : -1;
+        int dirz = transform.position.z - targetPos.z > 0 ? 1 : -1;
+        rigid.AddForce(new Vector3(dirx, 2, dirz) * ExplosionPower, ForceMode.Impulse);
     }
 
     void OffDamaged(){
