@@ -3,18 +3,19 @@ using System.Collections.Generic;
 using System.Numerics;
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
+using Quaternion = UnityEngine.Quaternion;
 using UnityEngine.SceneManagement;
 using System;
 
-public class PlayerBall : MonoBehaviour
+public class PlayerMove : MonoBehaviour
 {
     Rigidbody rigid;
     public float JumpPower;
     public float MovePower;
     bool isJump;
     bool isHiddenJump;
-    public int Score;
     public GameManagerLogic manager;
+    public GameObject finishPoint;
     public float befpos;
     public float strength;
     Vector3 moveVec;
@@ -25,6 +26,7 @@ public class PlayerBall : MonoBehaviour
     public AudioClip audioItem;
     public AudioClip audioDamaged;
     public AudioClip audioFinish;
+    public AudioClip audioJump;
     Renderer Renderer;
 
     private void Awake() {
@@ -44,6 +46,7 @@ public class PlayerBall : MonoBehaviour
         if(Input.GetButtonDown("Jump") && !isJump){
             isJump = true;
             rigid.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
+            PlaySound("JUMP");
         }
 
         /*else if(Input.GetButtonDown("Jump") && !isHiddenJump){
@@ -68,10 +71,19 @@ public class PlayerBall : MonoBehaviour
         //2. Move using keyboard
         moveVec = new Vector3(h, 0, v) * MovePower;
         rigid.AddForce(moveVec, ForceMode.Impulse);
+       // rigid.MovePosition(rigid.position + moveVec);
 
        //3. move using joystick on touch screen or mouse
-       Vector3 direction = new Vector3(x, 0, z);
-       rigid.AddForce(direction * MovePower, ForceMode.Impulse); //ForceMode.VelocityChange
+       Vector3 direction = new Vector3(x, 0, z) * MovePower;
+       rigid.AddForce(direction, ForceMode.Impulse); //ForceMode.VelocityChange
+       //rigid.MovePosition(rigid.position + direction);
+
+      /* //4. Move Rotation
+       if(moveVec.sqrMagnitude == 0) 
+            return; // No input, no ratation
+        Quaternion dirQuat = Quaternion.LookRotation(direction);
+        Quaternion moveQuat =  Quaternion.Slerp(rigid.rotation, dirQuat, 0.3f);
+        rigid.MoveRotation(moveQuat); */
 
        //4. Keep Move forward
       // rigid.AddForce(new Vector3(0,0,1) * 0.4f, ForceMode.VelocityChange);
@@ -89,7 +101,7 @@ public class PlayerBall : MonoBehaviour
 
         }
 
-        else if(collision.gameObject.tag == "Obstacle"){ // Can Jump on Obstaccle
+        else if(collision.gameObject.tag == "Obstacle"){ // Can Jump on Obstacle
             isJump = false;
         }
 
@@ -113,7 +125,7 @@ public class PlayerBall : MonoBehaviour
         if(heig > strength || bumped == true){ 
             // Damaged 
             manager.HealthUpDown(1);
-            manager.GetItemCount(manager.health);
+            manager.GetItemCount(manager.health, manager.ItemCount);
 
             //Change Layer(Immotal Active)
             gameObject.layer = 7;
@@ -123,8 +135,8 @@ public class PlayerBall : MonoBehaviour
 
             //Reaction Force
             if(type == "General") ReactionForce(targetPos, 100);
-            else if(type == "SmallBomb") ReactionForce(targetPos, 200);
-            else if(type == "BigBomb") ReactionForce(targetPos, 300);
+            else if(type == "SmallBomb") ReactionForce(targetPos, 150);
+            else if(type == "BigBomb") ReactionForce(targetPos, 250);
 
             PlaySound("DAMAGED");
             // no damage
@@ -146,26 +158,34 @@ public class PlayerBall : MonoBehaviour
 
     void OnTriggerEnter(Collider other){
 
-        if(other.tag == "Item"){ //1. Get Item Logic
-            //manager.health++;
+        //1. Get Item Logic
+        if(other.tag == "Item"){ 
             manager.HealthUpDown(-1);
-            manager.GetItemCount(manager.health);
+            manager.ItemUpDown();
+            manager.GetItemCount(manager.health, manager.ItemCount);
             PlaySound("ITEM");
             other.gameObject.SetActive(false); //SetActive(bool): 오브젝트 활성화 함수
+
+            if(manager.ItemCount == manager.totalItemCount){ 
+                finishPoint.SetActive(true); //Active Finish Point
+            }
         }
 
-        else if(other.tag == "Finish"){ //2. Finish Logic
+        //2. Finish Logic
+        else if(other.tag == "Finish"){ 
 
-            if(Score == manager.totalItemCount){
+            if(manager.ItemCount == 0){ //When get All Item
                 if(manager.stage == 2){
-                    SceneManager.LoadScene(0);
+                    SceneManager.LoadScene(manager.stage);
                 }
+            //3. Game Clear! && Nest Stage
                 else{
-                    SceneManager.LoadScene(manager.stage + 1); //3. Game Clear! && Nest Stage
+                    SceneManager.LoadScene(manager.stage + 1); 
                 }
             } 
+            //4. Restart
             else {
-                SceneManager.LoadScene(manager.stage); //4. Restart
+                SceneManager.LoadScene(manager.stage); 
             }
         }   
     }
@@ -181,6 +201,10 @@ public class PlayerBall : MonoBehaviour
             case "FINISH":
                 audio.clip = audioFinish;
                 break;
+
+            case "JUMP":
+                audio.clip = audioJump;
+                break; 
         }
         audio.Play();
     }
