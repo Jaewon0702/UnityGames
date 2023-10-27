@@ -6,26 +6,36 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManagerLogic : MonoBehaviour{
+    public int ItemCount;
     public int totalItemCount;
     public int stage; // 매 Scene마다 숫자를 바꿔야함!!
-    public Text playerCountText;
-    //public PlayerBall player;
+    public Text HealthText;
+    public Text ItemText;
     public Fracture fracture;
     public float health;
     public GameObject CrashedScreen00;
     public GameObject CrashedScreen01;
     public GameObject CrashedScreen02; 
     public GameObject Screen;
+    public GameObject item;
     void Awake(){
+        //1. Initial setup Health
         health = 5;
-        playerCountText.text = "X 5"; //Initial setup Health
+        HealthText.text = "X " + health; 
+        //2. Initial setup Item Count
+        ItemCount = 0;
+        totalItemCount = item.transform.childCount;
+        ItemText.text = "0 / " + totalItemCount;
+
     }
 
-    public void GetItemCount(float count){
+    public void GetItemCount(float health, int count){
+        HealthText.text = "X " + (health).ToString();
+        ItemText.text = (count).ToString() + " / " + totalItemCount;
+    }
 
-        playerCountText.text = "X " + (count).ToString();
-
-
+    public void ItemUpDown(){
+        ItemCount += 1;
     }
 
      public void HealthUpDown(float damage){ //Heath가 떨어짐에 따라 폰에 점점 금이 간다.
@@ -99,6 +109,7 @@ public class GameManagerLogic : MonoBehaviour{
     }
 
 }
+
 
 
 
