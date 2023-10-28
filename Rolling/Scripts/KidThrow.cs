@@ -10,8 +10,8 @@ public class KidThrow : MonoBehaviour
     public GameObject ballFactory;
     public float throwPower;
     new AudioSource audio;
-    public AudioClip audioLaugh;
-    public AudioClip audioThrow;
+    public AudioClip[] audioClips;
+    public bool isWalk;
 
     void Awake(){
         audio = GetComponent<AudioSource>();
@@ -34,20 +34,33 @@ public class KidThrow : MonoBehaviour
         //Kid의 정면 방향으로 Ball을 던지자.
         rigid.AddForce((throwPosition.transform.forward + Vector3.up) * throwPower,ForceMode.Impulse);
         //Kid Laughs when throw
-        ThrowSound("LAUGH");
-        ThrowSound("THROW");
+        if(isWalk == true){
+            ThrowSound("LAUGH");
+            ThrowSound("THROW");
+        }
+        else ThrowSound("SHOT");
+
+        
 
     }
 
     void ThrowSound(string action){ // Sound Set Function
     switch(action){
         case "LAUGH":
-            audio.clip = audioLaugh;
+            audio.clip = audioClips[0];
             break;
         case "THROW":
-            audio.clip = audioThrow;
+            audio.clip = audioClips[1];
+            break;
+        case "DRIVE":
+            audio.clip = audioClips[2]; 
+            break;
+        case "SHOT" :
+            audio.clip = audioClips[3];
             break;
     }
     audio.PlayOneShot(audio.clip); // Several Sounds can be played at the same time.
     }
 }
+
+
