@@ -1,3 +1,4 @@
+
 using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
@@ -6,7 +7,6 @@ using UnityEngine;
 
 public class KidsMove : MonoBehaviour
 {
-
     Rigidbody rigid;
     public int nextMoveX; // x direction
     public int nextMoveZ; // z direction
@@ -15,12 +15,15 @@ public class KidsMove : MonoBehaviour
     RaycastHit rayHit;
     Animator anim;
     KidThrow kidThrow;
+    public int waitTime;
+    public int startSpeed;
+    public bool isWalk;
     void Awake()
     {
        rigid = GetComponent<Rigidbody>();
        anim = GetComponent<Animator>();
        kidThrow = GetComponent<KidThrow>();
-       Invoke("Think", 5);
+       Invoke("Think", waitTime);
     }
 
     // Update is called once per frame
@@ -58,23 +61,26 @@ public class KidsMove : MonoBehaviour
     }    
 
     void Think()
-    { // 이런 공통적으로 쓰이는 함수를 Parent에 올리자.
-
+    { 
         //1. Set Next Active
         nextMoveX = Random.Range(-4, 5);
         nextMoveZ = Random.Range(-4, 5);
-        nextSpeed = Random.Range(0, 30);
-        
+        nextSpeed = Random.Range(startSpeed, 30);
+        waitTime = 5;
+        startSpeed = 0;
         //2. Sprite Animation
+    if(isWalk == true){
         // Idle
         if(nextMoveX == 0 && nextMoveZ == 0) anim.SetInteger("walkSpeed", nextSpeed);
         //Throw
-        else if(nextSpeed < 10){
+        else if(nextSpeed < 10){ // The Kids throws the ball with a 1/3 chance
             anim.SetInteger("walkSpeed", nextSpeed);
             anim.SetBool("isThrowing", true);
             anim.SetBool("isRunning", false);
             kidThrow.Throw();
-            nextSpeed = 1; // Kid stops when throwing
+            nextSpeed = 0; // Kid stops when throwing
+            waitTime = 2; // Kid move in short time after throwing
+            startSpeed = 11; // Kid can't throw more than twice
         }
         // Walk
         else if(nextSpeed < 20){ 
@@ -88,19 +94,31 @@ public class KidsMove : MonoBehaviour
             anim.SetBool("isRunning", true);
             anim.SetBool("isThrowing", false);
             }
+    }
+
+    else{ 
+        if(nextSpeed > 10) {
+            // Kid on the Vehicle throws the ball with a 2/3 chance 
+            // And only in move quickly
+            kidThrow.Throw(); 
+            waitTime = 2; // Kid move in short time after throwing
+        
+        }
+    }
 
         //Recursive
         float nextThinkTime = Random.Range(2f, 5f);
-        Invoke("Think", 5);
-
+        Invoke("Think", waitTime);
     }
 
     void ChangeDirection(){
-        nextMoveX *= -1; // Change Direction
-        nextMoveZ *= -1;
+        nextMoveX = Random.Range(-4, 5); // Change Direction
+        nextMoveZ = Random.Range(-4, 5);
         CancelInvoke(); // Stop Invoke
-        Invoke("Think", 2);
+        Invoke("Think", waitTime);
     }
 }
+
+
 
 
