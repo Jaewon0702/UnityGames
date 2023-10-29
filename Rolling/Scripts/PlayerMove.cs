@@ -42,22 +42,21 @@ public class PlayerMove : MonoBehaviour
 
     // Update is called once per frame
     void Update() {
-        //1. Jump when I press space bar
+        //1. Jumps when press space bar
         if(Input.GetButtonDown("Jump") && !isJump){
-            isJump = true;
-            rigid.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
-            PlaySound("JUMP");
+            Jump(JumpPower);
+        }
+        //2. Jumps if touchs another part of the screen other than the joystick
+        if(Input.GetMouseButtonDown(0) && !isJump && (joy.Horizontal+joy.Vertical) == 0){
+            //if joy.Horizontal+joy.Vertical equal 0, not touching joy range 
+            Jump(JumpPower);
         }
 
         /*else if(Input.GetButtonDown("Jump") && !isHiddenJump){
             isHiddenJump = true;
             rigid.AddForce(Vector3.up * JumpPower * 2.1f, ForceMode.Impulse);
-        }
-        //2. Jump when swipe up
-        /*else if(joy.Horizontal > 0 && !isJump){
-            isJump = true;
-            rigid.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
         }*/
+     
 
         
     }
@@ -87,6 +86,12 @@ public class PlayerMove : MonoBehaviour
 
        //4. Keep Move forward
       // rigid.AddForce(new Vector3(0,0,1) * 0.4f, ForceMode.VelocityChange);
+    }
+
+    void Jump(float JumpPower){
+        isJump = true;
+        rigid.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
+        PlaySound("JUMP");
     }
 
     void OnCollisionEnter(Collision collision) { //Floor에 한 번 닿아야 점프 가능!
