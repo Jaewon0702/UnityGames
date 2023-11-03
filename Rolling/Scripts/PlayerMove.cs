@@ -12,7 +12,7 @@ public class PlayerMove : MonoBehaviour
     Rigidbody rigid;
     public float JumpPower;
     public float MovePower;
-    bool isJump;
+    public bool isJump;
     bool isHiddenJump;
     public GameManagerLogic manager;
     public GameObject finishPoint;
@@ -28,7 +28,6 @@ public class PlayerMove : MonoBehaviour
     public AudioClip audioFinish;
     public AudioClip audioJump;
     Renderer Renderer;
-
     private void Awake() {
         isJump = false;
         isHiddenJump = false;
@@ -44,9 +43,9 @@ public class PlayerMove : MonoBehaviour
     void Update() {
         //1. Jumps when press space bar
         if(Input.GetButtonDown("Jump") && !isJump){
-            Jump(JumpPower);
+            Jump();
         }
-        //2. Jumps if touchs another part of the screen other than the joystick
+       /* //2. Jumps if touchs other side of the screen, not joystick
         if(Input.GetMouseButtonDown(0) && !isJump && (joy.Horizontal+joy.Vertical) == 0){
             //if joy.Horizontal+joy.Vertical equal 0, not touching joy range 
             Jump(JumpPower);
@@ -88,10 +87,12 @@ public class PlayerMove : MonoBehaviour
       // rigid.AddForce(new Vector3(0,0,1) * 0.4f, ForceMode.VelocityChange);
     }
 
-    void Jump(float JumpPower){
+    public void Jump(){
+        if(!isJump){
         isJump = true;
         rigid.AddForce(Vector3.up * JumpPower, ForceMode.Impulse);
-        PlaySound("JUMP");
+        PlaySound("JUMP");      
+        }
     }
 
     void OnCollisionEnter(Collision collision) { //Floor에 한 번 닿아야 점프 가능!
