@@ -12,35 +12,35 @@ public class KidThrow : MonoBehaviour
     new AudioSource audio;
     public AudioClip[] audioClips;
     public bool isWalk;
+    public TrailRenderer trailEffect;
 
     void Awake(){
         audio = GetComponent<AudioSource>();
     }
-    
-    // Update is called once per frame
-    void Update()
+     public void Throw()
     {
-        if(Input.GetMouseButtonDown(1)){
-            Throw();
-        }
-        
-    }
-
-    public void Throw()
-    {
-        GameObject ball = Instantiate(ballFactory); 
-        ball.transform.position = throwPosition.transform.position;
-        Rigidbody rigid = ball.GetComponent<Rigidbody>();
-        //Kid의 정면 방향으로 Ball을 던지자.
-        rigid.AddForce((throwPosition.transform.forward + Vector3.up) * throwPower,ForceMode.Impulse);
         //Kid Laughs when throw
         if(isWalk == true){
             ThrowSound("LAUGH");
             ThrowSound("THROW");
+            StopCoroutine(nameof(ThrowEffect));
+            StartCoroutine(nameof(ThrowEffect));
         }
         else ThrowSound("SHOT");
+        GameObject ball = Instantiate(ballFactory); 
+        ball.transform.position = throwPosition.transform.position;
+        Rigidbody rigid = ball.GetComponent<Rigidbody>();
+        //Let's Throw Ball Foward.
+        rigid.AddForce((throwPosition.transform.forward + Vector3.up) * throwPower,ForceMode.Impulse);
+    }
 
-        
+    IEnumerator ThrowEffect()
+    {
+        yield return new WaitForSeconds(0.3f);
+        trailEffect.enabled = true;
+
+        yield return new WaitForSeconds(0.5f);
+        trailEffect.enabled = false;
 
     }
 
@@ -62,5 +62,7 @@ public class KidThrow : MonoBehaviour
     audio.PlayOneShot(audio.clip); // Several Sounds can be played at the same time.
     }
 }
+
+
 
 
