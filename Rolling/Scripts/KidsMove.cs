@@ -1,8 +1,8 @@
-
 using System.Collections;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEngine;
 
 public class KidsMove : MonoBehaviour
@@ -18,6 +18,8 @@ public class KidsMove : MonoBehaviour
     public int waitTime;
     public int startSpeed;
     public bool isWalk;
+    int KidThrowSpeed = 7;
+
     void Awake()
     {
        rigid = GetComponent<Rigidbody>();
@@ -25,8 +27,6 @@ public class KidsMove : MonoBehaviour
        kidThrow = GetComponent<KidThrow>();
        Invoke("Think", waitTime);
     }
-
-    // Update is called once per frame
     void FixedUpdate()
     {   // 1. Move Position
         moveVec = new Vector3(nextMoveX, 0, nextMoveZ) * nextSpeed * Time.deltaTime;
@@ -41,8 +41,8 @@ public class KidsMove : MonoBehaviour
         rigid.MoveRotation(moveQuat); 
 
         // 3. Check the Kid on the Floor
-       Vector3 frontVec = transform.position + new Vector3(nextMoveX, 2, nextMoveZ) * 10; //Ray in front of the player positon
-       Debug.DrawRay(frontVec, -transform.up * 15, Color.red);
+       Vector3 frontVec = transform.position + new Vector3(nextMoveX, 1, nextMoveZ) * 10; //Ray in front of the player positon
+       //Debug.DrawRay(frontVec, -transform.up * 15, Color.red);
        bool CollisioDetectionF = Physics.Raycast(frontVec, -transform.up * 3, out rayHit, LayerMask.GetMask("Floor")); // Detect Kid on Floor
 
        //4. Change direction if kid meets cliff
@@ -58,41 +58,43 @@ public class KidsMove : MonoBehaviour
         if(CollisioDetectionW){
             Think();
        }*/
+
     }    
+
+   /* void Update(){
+        if(Input.GetMouseButtonDown(0)){
+            kidThrow.Throw(); 
+            KidsMoveAnim(false, false, true);
+        }
+    }*/
+
 
     void Think()
     { 
         //1. Set Next Active
         nextMoveX = Random.Range(-4, 5);
         nextMoveZ = Random.Range(-4, 5);
-        nextSpeed = Random.Range(startSpeed, 30);
-        waitTime = 5;
-        startSpeed = 0;
+        SetNextMove(Random.Range(startSpeed, 30), 5, 0);
         //2. Sprite Animation
     if(isWalk == true){
         // Idle
-        if(nextMoveX == 0 && nextMoveZ == 0) anim.SetInteger("walkSpeed", nextSpeed);
+        if(nextMoveX == 0 && nextMoveZ == 0) KidsMoveAnim(false, false, false);
         //Throw
-        else if(nextSpeed < 10){ // The Kids throws the ball with a 1/3 chance
-            anim.SetInteger("walkSpeed", nextSpeed);
-            anim.SetBool("isThrowing", true);
-            anim.SetBool("isRunning", false);
+        else if(nextSpeed < KidThrowSpeed){ // The Kids throws the ball with a 7/30 chance
+            KidsMoveAnim(false, false, true);
             kidThrow.Throw();
-            nextSpeed = 0; // Kid stops when throwing
-            waitTime = 2; // Kid move in short time after throwing
-            startSpeed = 11; // Kid can't throw more than twice
+            SetNextMove(0, 1, KidThrowSpeed);
+            // why 0?: Kid stops when throwing
+            // why 1?: Kid moves in short time after throwing
+            // why kidThrowSpeed?: Kid can't throw more than twice
         }
         // Walk
         else if(nextSpeed < 20){ 
-            anim.SetInteger("walkSpeed", nextSpeed);
-            anim.SetBool("isRunning", false);
-            anim.SetBool("isThrowing", false);
+            KidsMoveAnim(true, false, false);
             }
         // Run
         else{
-            anim.SetInteger("walkSpeed", nextSpeed);
-            anim.SetBool("isRunning", true);
-            anim.SetBool("isThrowing", false);
+            KidsMoveAnim(false, true, false);
             }
     }
 
@@ -101,14 +103,25 @@ public class KidsMove : MonoBehaviour
             // Kid on the Vehicle throws the ball with a 2/3 chance 
             // And only in move quickly
             kidThrow.Throw(); 
-            waitTime = 2; // Kid move in short time after throwing
+            waitTime = 3; // Kid move in short time after throwing
         
         }
     }
-
         //Recursive
         float nextThinkTime = Random.Range(2f, 5f);
         Invoke("Think", waitTime);
+    }
+
+    void KidsMoveAnim(bool isWalking, bool isRunning, bool isThrowing){
+        anim.SetBool("isWalking", isWalking);
+        anim.SetBool("isRunning", isRunning);
+        if(isThrowing == true) anim.SetTrigger("isThrow"); 
+    }
+
+    void SetNextMove(int Speed, int time, int startS){
+        nextSpeed = Speed;
+        waitTime = time;
+        startSpeed = startS;
     }
 
     void ChangeDirection(){
@@ -118,6 +131,8 @@ public class KidsMove : MonoBehaviour
         Invoke("Think", waitTime);
     }
 }
+
+
 
 
 
