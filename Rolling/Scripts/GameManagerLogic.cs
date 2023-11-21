@@ -12,10 +12,7 @@ public class GameManagerLogic : MonoBehaviour{
     public Text HealthText;
     public Text ItemText;
     public Fracture fracture;
-    public float health;
-    public GameObject CrashedScreen00;
-    public GameObject CrashedScreen01;
-    public GameObject CrashedScreen02; 
+    public float health; 
     public GameObject[] Screens;
     public GameObject Screen;
     public GameObject item;
@@ -101,6 +98,4 @@ public class GameManagerLogic : MonoBehaviour{
     }
 
 }
-
-
 
