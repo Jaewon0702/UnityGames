@@ -20,12 +20,16 @@ public class KidsMove : MonoBehaviour
     public bool isWalk;
     int KidThrowSpeed = 7;
 
+    public Vector3 dirNormalized;
+    public Vector3 finalDir;
+
     void Awake()
     {
        rigid = GetComponent<Rigidbody>();
        anim = GetComponent<Animator>();
        kidThrow = GetComponent<KidThrow>();
        Invoke("Think", waitTime);
+       dirNormalized = transform.localPosition.normalized;
     }
     void FixedUpdate()
     {   // 1. Move Position
@@ -46,9 +50,14 @@ public class KidsMove : MonoBehaviour
        bool CollisioDetectionF = Physics.Raycast(frontVec, -transform.up * 3, out rayHit, LayerMask.GetMask("Floor")); // Detect Kid on Floor
 
        //4. Change direction if kid meets cliff
-       if(!CollisioDetectionF){
-           ChangeDirection();
-       }
+        if(!CollisioDetectionF)
+            ChangeDirection();
+        
+        //5. Change direction if kid meets obstacle
+        finalDir = transform.TransformPoint(dirNormalized * 4);
+        if(Physics.Linecast(transform.position, finalDir, out rayHit, LayerMask.GetMask("Obstacle")))
+            ChangeDirection();
+       
 
      //5. Check the kid in front of Obstacle
      /*  Debug.DrawRay(frontVec, transform.forward * 5, Color.red);
@@ -128,9 +137,12 @@ public class KidsMove : MonoBehaviour
         nextMoveX = Random.Range(-4, 5); // Change Direction
         nextMoveZ = Random.Range(-4, 5);
         CancelInvoke(); // Stop Invoke
-        Invoke("Think", waitTime);
+        Invoke(nameof(Think), waitTime);
     }
 }
+
+
+
 
 
 
