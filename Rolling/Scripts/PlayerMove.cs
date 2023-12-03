@@ -23,11 +23,11 @@ public class PlayerMove : MonoBehaviour
     public VariableJoystick joy;
 
     new AudioSource audio;
-    public AudioClip audioItem;
-    public AudioClip audioDamaged;
-    public AudioClip audioFinish;
-    public AudioClip audioJump;
+    public AudioClip[] audioClips;
     Renderer Renderer;
+    Camera _camera;
+
+    public float smoothness = 10f;
     private void Awake() {
         isJump = false;
         isHiddenJump = false;
@@ -36,7 +36,10 @@ public class PlayerMove : MonoBehaviour
         rigid = GetComponent<Rigidbody>();
         audio = GetComponent<AudioSource>();
         Renderer = GetComponent<Renderer>();
-        
+    }
+
+    void Start(){
+        _camera = Camera.main;
     }
 
     // Update is called once per frame
@@ -61,31 +64,53 @@ public class PlayerMove : MonoBehaviour
     }
     void FixedUpdate()
     {
+        // Get the camera's forward and right vectors
+        Vector3 forward = _camera.transform.forward;
+        Vector3 right = _camera.transform.right;
+
+        // Project the vectors onto the horizontal plane (remove the vertical component)
+        forward.y = 0f;
+        right.y = 0f;
+
+        // Normalize the vectors to ensure consistent movement speed in all directions
+        forward.Normalize();
+        right.Normalize();
+
         //1. Input Value
         float h = Input.GetAxisRaw("Horizontal");
         float v = Input.GetAxisRaw("Vertical");
         float x = joy.Horizontal;
         float z = joy.Vertical;
-        //2. Move using keyboard
-        moveVec = new Vector3(h, 0, v) * MovePower;
-        rigid.AddForce(moveVec, ForceMode.Impulse);
+       // Vector3 playerRotate = Vector3.Scale(_camera.transform.forward, new Vector3(0, 1, 0));
+
+        //2. Move using keyboard and Input value chages in the direction the camera rotates
+        //moveVec = new Vector3(h, 0, v) * MovePower;
+        moveVec = h * right + v * forward;
+        rigid.AddForce(moveVec * MovePower, ForceMode.Impulse);
        // rigid.MovePosition(rigid.position + moveVec);
 
        //3. move using joystick on touch screen or mouse
-       Vector3 direction = new Vector3(x, 0, z) * MovePower;
-       rigid.AddForce(direction, ForceMode.Impulse); //ForceMode.VelocityChange
-       //rigid.MovePosition(rigid.position + direction);
+       Vector3 direction = x * right + z * forward;
+       rigid.AddForce(direction * MovePower, ForceMode.Impulse); //ForceMode.VelocityChange
 
-      /* //4. Move Rotation
+       /*4. Move Rotation
        if(moveVec.sqrMagnitude == 0) 
             return; // No input, no ratation
         Quaternion dirQuat = Quaternion.LookRotation(direction);
         Quaternion moveQuat =  Quaternion.Slerp(rigid.rotation, dirQuat, 0.3f);
-        rigid.MoveRotation(moveQuat); */
+        rigid.MoveRotation(moveQuat);*/
 
        //4. Keep Move forward
       // rigid.AddForce(new Vector3(0,0,1) * 0.4f, ForceMode.VelocityChange);
     }
+
+    /*Rotate Person following camera
+    void LateUpdate(){
+       Vector3 playerRotate = Vector3.Scale(_camera.transform.forward, new Vector3(0, -1, 0));
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(playerRotate), Time.deltaTime * smoothness);
+        //Debug.Log(_camera.transform.forward);
+       // Debug.Log(playerRotate);
+    }*/
 
     public void Jump(){
         if(!isJump){
@@ -199,17 +224,16 @@ public class PlayerMove : MonoBehaviour
     void PlaySound(string action){ // Sound Set Function
         switch(action){
             case "ITEM":
-                audio.clip = audioItem;
+                audio.clip = audioClips[0];
                 break;
             case "DAMAGED":
-                audio.clip = audioDamaged;
+                audio.clip = audioClips[1];
                 break;
             case "FINISH":
-                audio.clip = audioFinish;
+                audio.clip = audioClips[2];
                 break;
-
             case "JUMP":
-                audio.clip = audioJump;
+                audio.clip = audioClips[3];
                 break; 
         }
         audio.Play();
