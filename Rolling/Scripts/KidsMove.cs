@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
-
+using UnityEngine.AI;
 public class KidsMove : MonoBehaviour
 {
     Rigidbody rigid;
@@ -19,17 +19,20 @@ public class KidsMove : MonoBehaviour
     public int startSpeed;
     public bool isWalk;
     int KidThrowSpeed = 7;
+    public Transform target;
+    NavMeshAgent nav;
 
-    public Vector3 dirNormalized;
-    public Vector3 finalDir;
-
+    //public Vector3 dirNormalized;
+    //public Vector3 finalDir;
     void Awake()
     {
        rigid = GetComponent<Rigidbody>();
        anim = GetComponent<Animator>();
        kidThrow = GetComponent<KidThrow>();
+       nav = GetComponent<NavMeshAgent>();
        Invoke("Think", waitTime);
-       dirNormalized = transform.localPosition.normalized;
+       //StartCoroutine(ChageMovement());
+       //dirNormalized = transform.localPosition.normalized;
     }
     void FixedUpdate()
     {   // 1. Move Position
@@ -54,6 +57,7 @@ public class KidsMove : MonoBehaviour
             ChangeDirection();
         
         //5. Change direction if kid meets obstacle
+        /*
         finalDir = transform.TransformPoint(dirNormalized * 4);
         if(Physics.Linecast(transform.position, finalDir, out rayHit, LayerMask.GetMask("Obstacle")))
             ChangeDirection();
@@ -70,12 +74,14 @@ public class KidsMove : MonoBehaviour
 
     }    
 
-   /* void Update(){
-        if(Input.GetMouseButtonDown(0)){
+  // void Update(){
+        //nav.SetDestination(target.position);
+
+        /*if(Input.GetMouseButtonDown(0)){
             kidThrow.Throw(); 
             KidsMoveAnim(false, false, true);
-        }
-    }*/
+        }*/
+  //  }
 
 
     void Think()
@@ -86,8 +92,10 @@ public class KidsMove : MonoBehaviour
         SetNextMove(Random.Range(startSpeed, 30), 5, 0);
         //2. Sprite Animation
     if(isWalk == true){
+        //anim.SetTrigger("isTurnOn");
         // Idle
-        if(nextMoveX == 0 && nextMoveZ == 0) KidsMoveAnim(false, false, false);
+        if(nextMoveX == 0 && nextMoveZ == 0) 
+            KidsMoveAnim(false, false, false);
         //Throw
         else if(nextSpeed < KidThrowSpeed){ // The Kids throws the ball with a 7/30 chance
             KidsMoveAnim(false, false, true);
@@ -98,13 +106,13 @@ public class KidsMove : MonoBehaviour
             // why kidThrowSpeed?: Kid can't throw more than twice
         }
         // Walk
-        else if(nextSpeed < 20){ 
+        else if(nextSpeed < 20) 
             KidsMoveAnim(true, false, false);
-            }
+            
         // Run
-        else{
+        else
             KidsMoveAnim(false, true, false);
-            }
+            
     }
 
     else{ 
@@ -117,8 +125,13 @@ public class KidsMove : MonoBehaviour
         }
     }
         //Recursive
-        float nextThinkTime = Random.Range(2f, 5f);
         Invoke("Think", waitTime);
+        //StartCoroutine(ChageMovement());
+    }
+    IEnumerator ChageMovement()
+    {   //1. Kids Move randomly
+        yield return new WaitForSeconds(waitTime);
+        Think();
     }
 
     void KidsMoveAnim(bool isWalking, bool isRunning, bool isThrowing){
@@ -136,10 +149,31 @@ public class KidsMove : MonoBehaviour
     void ChangeDirection(){
         nextMoveX = Random.Range(-4, 5); // Change Direction
         nextMoveZ = Random.Range(-4, 5);
+
+        if(isWalk == true)
+            anim.SetTrigger("isTurnOn");
         CancelInvoke(); // Stop Invoke
         Invoke(nameof(Think), waitTime);
+       // StopCoroutine(ChageMovement());
+        //StartCoroutine(ChageMovement());
+        
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
