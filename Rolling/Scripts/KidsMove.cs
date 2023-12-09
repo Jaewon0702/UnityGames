@@ -8,19 +8,23 @@ using UnityEngine.AI;
 public class KidsMove : MonoBehaviour
 {
     Rigidbody rigid;
-    public int nextMoveX; // x direction
-    public int nextMoveZ; // z direction
-    public int nextSpeed;
-    Vector3 moveVec;
     RaycastHit rayHit;
     Animator anim;
     KidThrow kidThrow;
+    NavMeshAgent nav;
+
+    public int nextMoveX; // x direction
+    public int nextMoveZ; // z direction
+    public int nextSpeed;
     public int waitTime;
     public int startSpeed;
     public bool isWalk;
     int KidThrowSpeed = 7;
+    public bool isChase;
+    public float detectDistance;
+
+    Vector3 moveVec;
     public Transform target;
-    NavMeshAgent nav;
 
     //public Vector3 dirNormalized;
     //public Vector3 finalDir;
@@ -30,31 +34,21 @@ public class KidsMove : MonoBehaviour
        anim = GetComponent<Animator>();
        kidThrow = GetComponent<KidThrow>();
        nav = GetComponent<NavMeshAgent>();
+
        Invoke("Think", waitTime);
        //StartCoroutine(ChageMovement());
        //dirNormalized = transform.localPosition.normalized;
     }
     void FixedUpdate()
-    {   // 1. Move Position
-        moveVec = new Vector3(nextMoveX, 0, nextMoveZ) * nextSpeed * Time.deltaTime;
-        rigid.MovePosition(rigid.position + moveVec);
-
-        if(moveVec.sqrMagnitude == 0) 
-            return; // No input, no ratation
-
-        // 2. Move Rotation
-        Quaternion dirQuat = Quaternion.LookRotation(moveVec);
-        Quaternion moveQuat =  Quaternion.Slerp(rigid.rotation, dirQuat, 0.3f);
-        rigid.MoveRotation(moveQuat); 
-
-        // 3. Check the Kid on the Floor
-       Vector3 frontVec = transform.position + new Vector3(nextMoveX, 1, nextMoveZ) * 10; //Ray in front of the player positon
-       //Debug.DrawRay(frontVec, -transform.up * 15, Color.red);
-       bool CollisioDetectionF = Physics.Raycast(frontVec, -transform.up * 3, out rayHit, LayerMask.GetMask("Floor")); // Detect Kid on Floor
-
-       //4. Change direction if kid meets cliff
-        if(!CollisioDetectionF)
-            ChangeDirection();
+    {   
+        ChaseStart();
+        if(isChase)
+            MoveTowardsPlayer();
+        
+        else
+            MoveRandomly();
+        
+        
         
         //5. Change direction if kid meets obstacle
         /*
@@ -74,15 +68,54 @@ public class KidsMove : MonoBehaviour
 
     }    
 
-  // void Update(){
-        //nav.SetDestination(target.position);
+    void ChaseStart(){
+        if(Vector3.Distance(target.position, transform.position) < detectDistance)
+            isChase = true;
+        else 
+            isChase = false;
+    }
+    void MoveTowardsPlayer()
+    {
+        // Ensure that a target (player) is assigned
+        if (target == null)
+        {
+            Debug.LogError("Target not assigned to KidsMove.");
+            return;
+        }
 
-        /*if(Input.GetMouseButtonDown(0)){
-            kidThrow.Throw(); 
-            KidsMoveAnim(false, false, true);
-        }*/
-  //  }
+        // Use NavMeshAgent to move towards the player
+        nav.SetDestination(target.position);
 
+        // Optional: Update animations based on NavMeshAgent's velocity
+        //nav.speed = nextSpeed;
+        nextSpeed = (int)nav.velocity.magnitude; // To change Animation
+        //Debug.Log("moveSpeed: " + nextSpeed);
+        //KidsMoveAnim(moveSpeed > 0.1f, moveSpeed > 2f, false);
+    }
+
+    void MoveRandomly()
+    {
+        // 1. Move Position
+        moveVec = new Vector3(nextMoveX, 0, nextMoveZ) * nextSpeed * Time.fixedDeltaTime;
+        rigid.MovePosition(rigid.position + moveVec);
+
+        if(moveVec.sqrMagnitude == 0) 
+            return; // No input, no ratation
+
+        // 2. Move Rotation
+        Quaternion dirQuat = Quaternion.LookRotation(moveVec);
+        Quaternion moveQuat =  Quaternion.Slerp(rigid.rotation, dirQuat, 0.3f);
+        rigid.MoveRotation(moveQuat); 
+
+        // 3. Check the Kid on the Floor
+       Vector3 frontVec = transform.position + new Vector3(nextMoveX, 1, nextMoveZ) * 10; //Ray in front of the player positon
+       //Debug.DrawRay(frontVec, -transform.up * 15, Color.red);
+       bool CollisioDetectionF = Physics.Raycast(frontVec, -transform.up * 3, out rayHit, LayerMask.GetMask("Floor")); // Detect Kid on Floor
+
+       //4. Change direction if kid meets cliff
+        if(!CollisioDetectionF)
+            ChangeDirection();
+    }
 
     void Think()
     { 
@@ -94,7 +127,7 @@ public class KidsMove : MonoBehaviour
     if(isWalk == true){
         //anim.SetTrigger("isTurnOn");
         // Idle
-        if(nextMoveX == 0 && nextMoveZ == 0) 
+        if(nextMoveX == 0 && nextMoveZ == 0 && nextSpeed == 0) 
             KidsMoveAnim(false, false, false);
         //Throw
         else if(nextSpeed < KidThrowSpeed){ // The Kids throws the ball with a 7/30 chance
@@ -128,11 +161,11 @@ public class KidsMove : MonoBehaviour
         Invoke("Think", waitTime);
         //StartCoroutine(ChageMovement());
     }
-    IEnumerator ChageMovement()
+   /* IEnumerator ChageMovement()
     {   //1. Kids Move randomly
         yield return new WaitForSeconds(waitTime);
         Think();
-    }
+    }*/
 
     void KidsMoveAnim(bool isWalking, bool isRunning, bool isThrowing){
         anim.SetBool("isWalking", isWalking);
@@ -159,27 +192,3 @@ public class KidsMove : MonoBehaviour
         
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
