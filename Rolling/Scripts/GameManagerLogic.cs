@@ -16,6 +16,15 @@ public class GameManagerLogic : MonoBehaviour{
     public GameObject[] Screens;
     public GameObject Screen;
     public GameObject item;
+
+    public GameObject menuCam;
+    public GameObject gameCam;
+    public PlayerMove player;
+    public GameObject kids;
+
+    public GameObject menuPanel;
+    public GameObject gamePanel;
+    public GameObject crash;
     void Awake(){
         //1. Initial setup Health
         health = 5;
@@ -25,6 +34,13 @@ public class GameManagerLogic : MonoBehaviour{
         totalItemCount = item.transform.childCount;
         ItemText.text = "0 / " + totalItemCount;
 
+        //3. Crash in menu Plnel
+        Invoke("Crash", 2);
+
+    }
+
+    public void Crash(){
+        crash.SetActive(true);
     }
 
     public void GetItemCount(float health, int count){
@@ -97,5 +113,17 @@ public class GameManagerLogic : MonoBehaviour{
         }
     }
 
+    public void GameStart(){
+        menuCam.SetActive(false);
+        gameCam.SetActive(true);
+
+        menuPanel.SetActive(false);
+        gamePanel.SetActive(true);
+
+        //player.gameObject.SetActive(true);
+        kids.SetActive(true);
+    }
+
 }
+
 
