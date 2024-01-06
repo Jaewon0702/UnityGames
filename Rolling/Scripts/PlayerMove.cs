@@ -51,6 +51,12 @@ public class PlayerMove : MonoBehaviour
         if(Input.GetButtonDown("Jump") && !isJump){
             Jump();
         }
+        // Make smartphone visible
+        if(opaque == true){
+            StopCoroutine(Translucent());
+            Invisible(true);
+            opaque = false;
+        }
        /* //2. Jumps if touchs other side of the screen, not joystick
         if(Input.GetMouseButtonDown(0) && !isJump && (joy.Horizontal+joy.Vertical) == 0){
             //if joy.Horizontal+joy.Vertical equal 0, not touching joy range 
@@ -160,12 +166,12 @@ public class PlayerMove : MonoBehaviour
       void OnDamaged(Vector3 targetPos, bool bumped, string type){
         float heig = befpos - targetPos.y;
         befpos = transform.position.y; // 높은 곳에서 폰이 떨어지면 데미지를 입는다.
-
+        opaque = true;
         if(heig > strength || bumped == true){ 
             // Damaged 
             manager.HealthUpDown(1);
             manager.GetItemCount(manager.health, manager.ItemCount);
-            opaque = true;
+            
 
             //Change Layer(Immotal Active)
             gameObject.layer = 7;
@@ -252,7 +258,7 @@ public class PlayerMove : MonoBehaviour
             yield break;
            }
         else{
-            yield return new WaitForSeconds(3.0f);
+            yield return new WaitForSeconds(20.0f);
             Invisible(true);
         }
     }
@@ -264,8 +270,8 @@ public class PlayerMove : MonoBehaviour
         Debug.Log("렌더러 작동 중");
         //2. Screen Translucent
         foreach(GameObject screen in Screens){
-            if(screen.activeSelf == true)
-                screen.GetComponent<Renderer>().enabled = invisible;
+            //if(screen.activeSelf == true)
+            screen.GetComponent<Renderer>().enabled = invisible;
                 }
     }
 
