@@ -26,11 +26,14 @@ public class PlayerMove : MonoBehaviour
     public AudioClip[] audioClips;
     Renderer Renderer;
     Camera _camera;
+    public GameObject[] Screens;
+    public bool opaque;
 
     public float smoothness = 10f;
     private void Awake() {
         isJump = false;
         isHiddenJump = false;
+        opaque = false;
         befpos = -34;
         strength = 50;
         rigid = GetComponent<Rigidbody>();
@@ -134,14 +137,19 @@ public class PlayerMove : MonoBehaviour
 
         else if(collision.gameObject.tag == "Obstacle"){ // Can Jump on Obstacle
             isJump = false;
+           
+
         }
 
         else if(collision.gameObject.tag == "Enemy"){
             OnDamaged(collision.transform.position, true, "General");
+            
+
 
         }
         else if(collision.gameObject.tag == "SmallBomb"){
             OnDamaged(collision.transform.position, true, "SmallBomb");
+            
         }
         else if(collision.gameObject.tag == "BigBomb"){
             OnDamaged(collision.transform.position, true, "BigBomb");
@@ -157,6 +165,7 @@ public class PlayerMove : MonoBehaviour
             // Damaged 
             manager.HealthUpDown(1);
             manager.GetItemCount(manager.health, manager.ItemCount);
+            opaque = true;
 
             //Change Layer(Immotal Active)
             gameObject.layer = 7;
@@ -220,6 +229,46 @@ public class PlayerMove : MonoBehaviour
             }
         }   
     }
+
+    void Cloak(){
+        StartCoroutine(Translucent());
+        /*if(opaque == true){
+            StopCoroutine(Translucent());
+            Invisible(true);
+            opaque = false;
+            }*/
+    }
+    
+    
+    IEnumerator Translucent(){
+        //1. Smartphone Translucent
+        Invisible(false);
+
+       yield return null;
+        //2. if player coliide(get item, damaged, etc..)
+        if(opaque == true){
+            Invisible(true); // 왜 이 부분이 작동 안 하는지 모르갰다. 내일 챗 지피티한테 물어보자.
+            opaque = false;
+            yield break;
+           }
+        else{
+            yield return new WaitForSeconds(3.0f);
+            Invisible(true);
+        }
+    }
+        
+        
+    public void Invisible(bool invisible){
+        //1. Smartphone Translucent
+        Renderer.enabled = invisible; 
+        Debug.Log("렌더러 작동 중");
+        //2. Screen Translucent
+        foreach(GameObject screen in Screens){
+            if(screen.activeSelf == true)
+                screen.GetComponent<Renderer>().enabled = invisible;
+                }
+    }
+
 
     void PlaySound(string action){ // Sound Set Function
         switch(action){
