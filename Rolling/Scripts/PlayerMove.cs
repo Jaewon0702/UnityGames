@@ -18,16 +18,16 @@ public class PlayerMove : MonoBehaviour
     public GameObject finishPoint;
     public float befpos;
     public float strength;
-    Vector3 moveVec;
 
     public VariableJoystick joy;
 
     new AudioSource audio;
     public AudioClip[] audioClips;
     Renderer Renderer;
-    Camera _camera;
+    public GameObject _camera;
     public GameObject[] Screens;
     public bool opaque;
+    public float turnSpeed = 5f;
 
     public float smoothness = 10f;
     private void Awake() {
@@ -41,10 +41,6 @@ public class PlayerMove : MonoBehaviour
         Renderer = GetComponent<Renderer>();
     }
 
-    void Start(){
-        _camera = Camera.main;
-    }
-
     // Update is called once per frame
     void Update() {
         //1. Jumps when press space bar
@@ -54,73 +50,39 @@ public class PlayerMove : MonoBehaviour
         // Make smartphone visible
         if(opaque == true){
             StopCoroutine(Translucent());
-            Invisible(true);
+            Visible(true);
             opaque = false;
-        }
-       /* //2. Jumps if touchs other side of the screen, not joystick
-        if(Input.GetMouseButtonDown(0) && !isJump && (joy.Horizontal+joy.Vertical) == 0){
-            //if joy.Horizontal+joy.Vertical equal 0, not touching joy range 
-            Jump(JumpPower);
-        }
-
-        /*else if(Input.GetButtonDown("Jump") && !isHiddenJump){
-            isHiddenJump = true;
-            rigid.AddForce(Vector3.up * JumpPower * 2.1f, ForceMode.Impulse);
-        }*/
-     
-
-        
+        } 
     }
-    void FixedUpdate()
-    {
-        // Get the camera's forward and right vectors
-        Vector3 forward = _camera.transform.forward;
-        Vector3 right = _camera.transform.right;
+    void FixedUpdate(){
+        Move();
+        }
 
-        // Project the vectors onto the horizontal plane (remove the vertical component)
-        forward.y = 0f;
-        right.y = 0f;
+    void Move(){
+    // Get the camera's forward and right vectors
+    Vector3 forward = _camera.transform.forward;
+    Vector3 right = _camera.transform.right;
 
-        // Normalize the vectors to ensure consistent movement speed in all directions
-        forward.Normalize();
-        right.Normalize();
+    // Project the vectors onto the horizontal plane (remove the vertical component)
+    forward.y = 0f;
+    right.y = 0f;
 
-        //1. Input Value
-        float h = Input.GetAxisRaw("Horizontal");
-        float v = Input.GetAxisRaw("Vertical");
-        float x = joy.Horizontal;
-        float z = joy.Vertical;
-       // Vector3 playerRotate = Vector3.Scale(_camera.transform.forward, new Vector3(0, 1, 0));
+    // Normalize the vectors to ensure consistent movement speed in all directions
+    forward.Normalize();
+    right.Normalize();
 
-        //2. Move using keyboard and Input value chages in the direction the camera rotates
-        //moveVec = new Vector3(h, 0, v) * MovePower;
-        moveVec = h * right + v * forward;
-        rigid.AddForce(moveVec * MovePower, ForceMode.Impulse);
-       // rigid.MovePosition(rigid.position + moveVec);
+    //1. Input Value
+    float h = Input.GetAxisRaw("Horizontal");
+    float v = Input.GetAxisRaw("Vertical");
+    float x = joy.Horizontal;
+    float z = joy.Vertical;
 
-       //3. move using joystick on touch screen or mouse
-       Vector3 direction = x * right + z * forward;
-       rigid.AddForce(direction * MovePower, ForceMode.Impulse); //ForceMode.VelocityChange
-
-       /*4. Move Rotation
-       if(moveVec.sqrMagnitude == 0) 
-            return; // No input, no ratation
-        Quaternion dirQuat = Quaternion.LookRotation(direction);
-        Quaternion moveQuat =  Quaternion.Slerp(rigid.rotation, dirQuat, 0.3f);
-        rigid.MoveRotation(moveQuat);*/
-
-       //4. Keep Move forward
-      // rigid.AddForce(new Vector3(0,0,1) * 0.4f, ForceMode.VelocityChange);
+    //2. Move Player Following Camera
+    Vector3 direction = (h != 0 || v != 0) ? h * right + v * forward : x * right + z * forward;
+    if (direction != Vector3.zero){
+        rigid.AddForce(direction * MovePower, ForceMode.Impulse);
+        }
     }
-
-    /*Rotate Person following camera
-    void LateUpdate(){
-       Vector3 playerRotate = Vector3.Scale(_camera.transform.forward, new Vector3(0, -1, 0));
-        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(playerRotate), Time.deltaTime * smoothness);
-        //Debug.Log(_camera.transform.forward);
-       // Debug.Log(playerRotate);
-    }*/
-
     public void Jump(){
         if(!isJump){
         isJump = true;
@@ -138,20 +100,14 @@ public class PlayerMove : MonoBehaviour
 
         else if(collision.gameObject.tag == "HiddenFloor"){
             isHiddenJump = false;
-
         }
 
         else if(collision.gameObject.tag == "Obstacle"){ // Can Jump on Obstacle
             isJump = false;
-           
-
         }
 
         else if(collision.gameObject.tag == "Enemy"){
             OnDamaged(collision.transform.position, true, "General");
-            
-
-
         }
         else if(collision.gameObject.tag == "SmallBomb"){
             OnDamaged(collision.transform.position, true, "SmallBomb");
@@ -180,9 +136,9 @@ public class PlayerMove : MonoBehaviour
             //Renderer.material.color = new Color(0, 0, 0, 1f); // not work
 
             //Reaction Force
-            if(type == "General") ReactionForce(targetPos, 100);
-            else if(type == "SmallBomb") ReactionForce(targetPos, 150);
-            else if(type == "BigBomb") ReactionForce(targetPos, 250);
+            if(type == "General") ReactionForce(targetPos, 80);
+            else if(type == "SmallBomb") ReactionForce(targetPos, 120);
+            else if(type == "BigBomb") ReactionForce(targetPos, 160);
 
             PlaySound("DAMAGED");
             // no damage
@@ -238,36 +194,24 @@ public class PlayerMove : MonoBehaviour
 
     void Cloak(){
         StartCoroutine(Translucent());
-        /*if(opaque == true){
-            StopCoroutine(Translucent());
-            Invisible(true);
-            opaque = false;
-            }*/
     }
     
     
     IEnumerator Translucent(){
         //1. Smartphone Translucent
-        Invisible(false);
-
-       yield return null;
+        Visible(false);
+        yield return null;
         //2. if player coliide(get item, damaged, etc..)
-        if(opaque == true){
-            Invisible(true); // 왜 이 부분이 작동 안 하는지 모르갰다. 내일 챗 지피티한테 물어보자.
-            opaque = false;
-            yield break;
+        if(opaque == false){
+            yield return new WaitForSeconds(3.0f);
+            Visible(true);
            }
-        else{
-            yield return new WaitForSeconds(20.0f);
-            Invisible(true);
-        }
     }
         
         
-    public void Invisible(bool invisible){
+    public void Visible(bool invisible){
         //1. Smartphone Translucent
         Renderer.enabled = invisible; 
-        Debug.Log("렌더러 작동 중");
         //2. Screen Translucent
         foreach(GameObject screen in Screens){
             //if(screen.activeSelf == true)
