@@ -27,9 +27,6 @@ public class PlayerMove : MonoBehaviour
     public GameObject _camera;
     public GameObject[] Screens;
     public bool opaque;
-    public float turnSpeed = 5f;
-
-    public float smoothness = 10f;
     private void Awake() {
         isJump = false;
         isHiddenJump = false;
@@ -140,7 +137,8 @@ public class PlayerMove : MonoBehaviour
             else if(type == "SmallBomb") ReactionForce(targetPos, 120);
             else if(type == "BigBomb") ReactionForce(targetPos, 160);
 
-            PlaySound("DAMAGED");
+            if(manager.health != 0)
+                PlaySound("DAMAGED");
             // no damage
             Invoke("OffDamaged",3);
 
@@ -191,11 +189,9 @@ public class PlayerMove : MonoBehaviour
             }
         }   
     }
-
     void Cloak(){
         StartCoroutine(Translucent());
     }
-    
     
     IEnumerator Translucent(){
         //1. Smartphone Translucent
@@ -207,8 +203,6 @@ public class PlayerMove : MonoBehaviour
             Visible(true);
            }
     }
-        
-        
     public void Visible(bool invisible){
         //1. Smartphone Translucent
         Renderer.enabled = invisible; 
@@ -218,8 +212,6 @@ public class PlayerMove : MonoBehaviour
             screen.GetComponent<Renderer>().enabled = invisible;
                 }
     }
-
-
     void PlaySound(string action){ // Sound Set Function
         switch(action){
             case "ITEM":
