@@ -42,11 +42,11 @@ public class KidsMove : MonoBehaviour
     }
     void FixedUpdate()
     {   
-        ChaseStart();
-        if(isChase)
-            MoveTowardsPlayer();
+        //ChaseStart();
+        /*if(isChase)
+          MoveTowardsPlayer();
         
-        else
+        else*/
             MoveRandomly();
         
         
@@ -85,7 +85,7 @@ public class KidsMove : MonoBehaviour
         }
 
         // Use NavMeshAgent to move towards the player
-        nav.SetDestination(target.position);
+        //nav.SetDestination(target.position);
 
         // Optional: Update animations based on NavMeshAgent's velocity
         //nav.speed = nextSpeed;
@@ -123,7 +123,7 @@ public class KidsMove : MonoBehaviour
         //1. Set Next Active
         nextMoveX = Random.Range(-4, 5);
         nextMoveZ = Random.Range(-4, 5);
-        SetNextMove(Random.Range(startSpeed, 30), 5, 0,Random.Range(1, 11));
+        SetNextMove(Random.Range(2, 30), 5, 1,Random.Range(1, 11));
         
         //2. Sprite Animation
     if(isWalk == true){
@@ -143,10 +143,10 @@ public class KidsMove : MonoBehaviour
     if(probThrow1 < probThrow2){ // The Kids throws the ball with a 40% chance in 5s.
         KidsMoveAnim(false, false, true);
         kidThrow.Throw();
-        SetNextMove(0, 1, 0, probThrow2 + 1);
+        SetNextMove(0, 1, 1, probThrow2 + 1);
         // why 0?: Kid stops when throwing
         // why 1?: Kid moves in short time after throwing
-        // why probThrow2 + 1?: Kid can't throw more than twice
+        // why probThrow2 + 1?: Kid can't throw more than twice in 6s.
         }
             
     }
@@ -196,4 +196,3 @@ public class KidsMove : MonoBehaviour
         
     }
 }
-
