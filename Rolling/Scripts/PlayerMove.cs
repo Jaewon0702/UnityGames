@@ -26,7 +26,9 @@ public class PlayerMove : MonoBehaviour
     Renderer Renderer;
     public GameObject _camera;
     public GameObject[] Screens;
-    public bool opaque;
+    private bool opaque;
+    public Material[] TranslucentMaterial = new Material[2];
+    public Material[] OriginalMaterial = new Material[2];
     private void Awake() {
         isJump = false;
         isHiddenJump = false;
@@ -44,7 +46,7 @@ public class PlayerMove : MonoBehaviour
         if(Input.GetButtonDown("Jump") && !isJump){
             Jump();
         }
-        // Make smartphone visible
+        //2. if player coliide(get item, damaged, etc..) make smartphone visible
         if(opaque == true){
             StopCoroutine(Translucent());
             Visible(true);
@@ -197,7 +199,7 @@ public class PlayerMove : MonoBehaviour
         //1. Smartphone Translucent
         Visible(false);
         yield return null;
-        //2. if player coliide(get item, damaged, etc..)
+        //2. Make smartphone visible after 3 seconds
         if(opaque == false){
             yield return new WaitForSeconds(3.0f);
             Visible(true);
@@ -205,10 +207,10 @@ public class PlayerMove : MonoBehaviour
     }
     public void Visible(bool invisible){
         //1. Smartphone Translucent
-        Renderer.enabled = invisible; 
+        if(invisible == false) Renderer.sharedMaterials = TranslucentMaterial;
+        else Renderer.sharedMaterials = OriginalMaterial;
         //2. Screen Translucent
         foreach(GameObject screen in Screens){
-            //if(screen.activeSelf == true)
             screen.GetComponent<Renderer>().enabled = invisible;
                 }
     }
