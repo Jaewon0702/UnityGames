@@ -24,6 +24,8 @@ public class KidsMove : MonoBehaviour
     public bool isChase;
     public float detectDistance;
 
+    public bool chase = false;
+
     Vector3 moveVec;
     public Transform target;
 
@@ -42,12 +44,26 @@ public class KidsMove : MonoBehaviour
     }
     void FixedUpdate()
     {   
-        //ChaseStart();
-        /*if(isChase)
+        if(chase == true)
+        {
+            ChaseStart();
+            if (isChase)
+                MoveTowardsPlayer();
+
+            else
+                MoveRandomly();
+        }
+        else
+        {
+            MoveRandomly();
+        }
+        /*ChaseStart();
+        if(isChase)
           MoveTowardsPlayer();
         
-        else*/
-            MoveRandomly();
+        else
+            MoveRandomly();*/
+         MoveRandomly();
         
         
         
@@ -70,8 +86,10 @@ public class KidsMove : MonoBehaviour
     }    
 
     void ChaseStart(){
-        if(Vector3.Distance(target.position, transform.position) < detectDistance)
+        if(Vector3.Distance(target.position, transform.position) < detectDistance){
             isChase = true;
+            Debug.Log("Chase Start");
+            }
         else 
             isChase = false;
     }
@@ -85,7 +103,7 @@ public class KidsMove : MonoBehaviour
         }
 
         // Use NavMeshAgent to move towards the player
-        //nav.SetDestination(target.position);
+        nav.SetDestination(target.position);
 
         // Optional: Update animations based on NavMeshAgent's velocity
         //nav.speed = nextSpeed;
