@@ -29,6 +29,9 @@ public class KidsMove : MonoBehaviour
     Vector3 moveVec;
     public Transform target;
 
+    new AudioSource audio;
+    public AudioClip[] audioClips;
+
     //public Vector3 dirNormalized;
     //public Vector3 finalDir;
     void Awake()
@@ -37,6 +40,7 @@ public class KidsMove : MonoBehaviour
        anim = GetComponent<Animator>();
        kidThrow = GetComponent<KidThrow>();
        nav = GetComponent<NavMeshAgent>();
+       audio = GetComponent<AudioSource>();
 
        Invoke("Think", waitTime);
        //StartCoroutine(ChageMovement());
@@ -89,7 +93,9 @@ public class KidsMove : MonoBehaviour
         if(Vector3.Distance(target.position, transform.position) < detectDistance){
             isChase = true;
             Debug.Log("Chase Start");
+            //KidSound("Find")
             }
+        
         else 
             isChase = false;
     }
@@ -213,4 +219,14 @@ public class KidsMove : MonoBehaviour
         //StartCoroutine(ChageMovement());
         
     }
+    void KidSound(string action){ // Sound Set Function
+    switch(action){
+        case "Find":
+            audio.clip = audioClips[0];
+            break;
+    }
+    audio.PlayOneShot(audio.clip); // Several Sounds can be played at the same time.
+    }
 }
+
+
